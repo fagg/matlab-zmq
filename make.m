@@ -1,0 +1,19 @@
+% make.m - Builds mex functions.
+
+%% Set paths to ZMQ
+INCLUDE_PATH = '/usr/local/Cellar/zeromq/4.0.4/include/';
+LIB_PATH = '/usr/local/Cellar/zeromq/4.0.4/lib/';
+COMPILE_FLAGS = sprintf('-I%s -L%s', INCLUDE_PATH, LIB_PATH);
+
+FILE_LIST = {'zmq_version.cc', ...
+             'zmq_ctx_new.cc', ...
+             'zmq_ctx_term.cc', ...
+             'zmq_ctx_shutdown.cc', ...
+             'zmq_ctx_get.cc', ...
+             'zmq_ctx_set.cc', ...
+             'zmq_socket.cc'};
+        
+
+BUILD_FUNCTION = @(file) eval(['mex ', COMPILE_FLAGS, sprintf(' %s ', char(file)), '-lzmq']);
+cellfun(BUILD_FUNCTION, FILE_LIST);
+
