@@ -14,6 +14,5 @@ FILE_LIST = {'zmq_version.c', ...
              'zmq_socket.c'};
         
 
-BUILD_FUNCTION = @(file) eval(['mex -v', COMPILE_FLAGS, sprintf(' %s ', char(file)), '-lzmq']);
+BUILD_FUNCTION = @(file) eval(['mex ', COMPILE_FLAGS, sprintf(' %s ', char(file)), '-lzmq']);
 cellfun(BUILD_FUNCTION, FILE_LIST);
-
