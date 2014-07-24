@@ -10,6 +10,13 @@ following:
 + Mex bindings for libzmq (core ZMQ API).
 + Using said Mex bindings, a "nicer" interface to ZMQ for use with MATLAB.
 
+Getting Started
+---------------
++ Make sure you have ZMQ 4.0.4 installed. Change settings in make.m to point to your installation. (NOTE: Windows has
+not been tested. Mac and Linux should work).
++ Ensure you have mex configured
++ Run make.m
+
 Can I help?
 -----------
 
