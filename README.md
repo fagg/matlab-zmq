@@ -12,8 +12,7 @@ following:
 
 Getting Started
 ---------------
-+ Make sure you have ZMQ 4.0.4 installed. Change settings in make.m to point to your installation. (NOTE: Windows has
-not been tested. Mac and Linux should work).
++ Make sure you have ZMQ 4.0.4 installed. Change settings in make.m to point to your installation.
 + Ensure you have mex configured
 + Run make.m
 
@@ -27,3 +26,11 @@ How can I contact you?
 -----------------------
 
 ashton@fagg.id.au
+
+Contributors
+------------
+
+The following people have made contributions to this library (with my sincere thanks):
+
+- Anderson Bravalheri (@abravalheri - Initial support for Windows)
+
