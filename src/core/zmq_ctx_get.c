@@ -12,6 +12,9 @@ int core_ctx_get(const mxArray *[]);
 
 void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 {
+    int coreAPIReturn;
+    int *mexReturn;
+
     if (nrhs != 2) {
         mexErrMsgIdAndTxt("zmq:ctx_get:invalidArgs",
                 "Error: Need two arguments - context and option_name.");
@@ -25,21 +28,25 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
                 "Error: option_name must be a row vector.");
     }
 
-    int coreAPIReturn = core_ctx_get(prhs);
+    coreAPIReturn = core_ctx_get(prhs);
 
     if (sizeof(void *) == 4) {
         plhs[0] = mxCreateNumericMatrix(1,1,mxUINT32_CLASS, mxREAL);
     } else {
         plhs[0] = mxCreateNumericMatrix(1,1,mxUINT64_CLASS, mxREAL);
     }
-    int *mexReturn = (int *) mxGetData(plhs[0]);
+    mexReturn = (int *) mxGetData(plhs[0]);
     *mexReturn = coreAPIReturn;
 }
 
 char *get_option_name(const mxArray *param)
 {
-    int optLen = mxGetM(param) * mxGetN(param) + 1;
-    char *ret = (char *) mxCalloc(optLen, sizeof(char));
+    int optLen;
+    char *ret;
+
+    optLen = mxGetM(param) * mxGetN(param) + 1;
+    ret = (char *) mxCalloc(optLen, sizeof(char));
+
     if (mxGetString(param, ret, optLen) != 0) {
         mexErrMsgIdAndTxt("zmq:ctx_get:optNameCopyFail",
                 "Error: Couldn't get option_name as string.");
@@ -50,8 +57,11 @@ char *get_option_name(const mxArray *param)
 int core_ctx_get(const mxArray *params[])
 {
     int ret, optSelection;
-    char *option = get_option_name(params[1]);
-    void **contextPtr = (void **) mxGetData(params[0]);
+    char *option;
+    void **contextPtr;
+
+    option = get_option_name(params[1]);
+    contextPtr = (void **) mxGetData(params[0]);
 
     if (!strcmp(option, "ZMQ_IO_THREADS"))
         optSelection = ZMQ_IO_THREADS;

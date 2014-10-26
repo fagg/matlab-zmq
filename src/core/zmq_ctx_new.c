@@ -3,12 +3,15 @@
 
 void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 {
+    void *context;
+    void **mexReturn;
+
     if (nrhs != 0) {
         mexErrMsgIdAndTxt("zmq:ctx_new:invalidArgs",
             "Error: No arguments are accepted by this function.");
     }
     /* Set up ZMQ context and check its validity */
-    void *context = zmq_ctx_new();
+    context = zmq_ctx_new();
     if (context == NULL) {
          mexErrMsgIdAndTxt("zmq:ctx_new:contextInitFail",
                  "Error: ZMQ context instantiation failed.");
@@ -21,6 +24,6 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
         plhs[0] = mxCreateNumericMatrix(1, 1, mxUINT64_CLASS, mxREAL);
     }
 
-    void **mexReturn = (void **) mxGetData(plhs[0]);
+    mexReturn = (void **) mxGetData(plhs[0]);
     mexReturn[0] = context;
 }

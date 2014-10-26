@@ -8,6 +8,9 @@ void *core_socket(const mxArray *[]);
 
 void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 {
+    void *coreAPIReturn;
+    void **mexReturn;
+
     if (nrhs != 2) {
         mexErrMsgIdAndTxt("zmq:socket:invalidArgs",
                 "Error: Two arguments are required - context, socket_type.");
@@ -20,20 +23,24 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
         mexErrMsgIdAndTxt("zmq:socket:sockTypeNotRowVec",
                 "Error: socket_type is not a row vector.");
     }
-    void *coreAPIReturn = core_socket(prhs);
+    coreAPIReturn = core_socket(prhs);
     if (sizeof(void *) == 4) {
         plhs[0] = mxCreateNumericMatrix(1,1,mxUINT32_CLASS, mxREAL);
     } else {
         plhs[0] = mxCreateNumericMatrix(1,1,mxUINT64_CLASS, mxREAL);
     }
-    void **mexReturn = (void **) mxGetData(plhs[0]);
+    mexReturn = (void **) mxGetData(plhs[0]);
     mexReturn[0] = coreAPIReturn;
 }
 
 char *get_socket_type(const mxArray *param)
 {
-    int optLen = mxGetM(param) * mxGetN(param) + 1;
-    char *ret = (char *) mxCalloc(optLen, sizeof(char));
+    int optLen;
+    char *ret;
+
+    optLen = mxGetM(param) * mxGetN(param) + 1;
+    ret = (char *) mxCalloc(optLen, sizeof(char));
+
     if (mxGetString(param, ret, optLen) != 0) {
         mexErrMsgIdAndTxt("zmq:socket:sockTypeCopyFail",
                 "Error: Couldn't get socket_type as string.");
@@ -44,8 +51,12 @@ char *get_socket_type(const mxArray *param)
 void *core_socket(const mxArray *params[])
 {
     int sockTypeVal;
-    char *sockType = get_socket_type(params[1]);
-    void **contextPtr = (void **) mxGetData(params[0]);
+    char *sockType;
+    void **contextPtr;
+    void *coreAPIReturn;
+
+    sockType = get_socket_type(params[1]);
+    contextPtr = (void **) mxGetData(params[0]);
 
     if (!strcmp(sockType, "ZMQ_REQ"))
         sockTypeVal = ZMQ_REQ;
@@ -77,7 +88,7 @@ void *core_socket(const mxArray *params[])
                 "Error: Unknown socket type.");
     }
 
-    void *coreAPIReturn = zmq_socket(*contextPtr, sockTypeVal);
+    coreAPIReturn = zmq_socket(*contextPtr, sockTypeVal);
     if (coreAPIReturn == NULL) {
         switch (errno) {
             case EINVAL:
