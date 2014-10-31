@@ -56,13 +56,8 @@ function make(varargin)
     % TODO: consider the much nicer second alternative. Is it reliable in a
     % wide range of environments (diferent versions of Windows, even the
     % future ones)?
-    reduce_path = @(orig_path) system(['for %A in ("', orig_path ,'") do @echo %~sA']);
-    [status, ZMQ_INCLUDE_PATH] = reduce_path(ZMQ_INCLUDE_PATH);
-    if status; error('mex:compile', 'Unable to recognize path'); end
-    ZMQ_INCLUDE_PATH = strtrim(ZMQ_INCLUDE_PATH);
-    [status, ZMQ_LIB_PATH] = reduce_path(ZMQ_LIB_PATH);
-    if status; error('mex:compile', 'Unable to recognize path'); end
-    ZMQ_LIB_PATH = strtrim(ZMQ_LIB_PATH);
+    ZMQ_INCLUDE_PATH = reducepath(ZMQ_INCLUDE_PATH);
+    ZMQ_LIB_PATH = reducepath(ZMQ_LIB_PATH);
   end
   % <--
 
@@ -95,12 +90,16 @@ function make(varargin)
   % Inexplicably just using quotes (`sprintf(' "%s" -outdir "%s"', ...`) does
   % not work on Windows, even when there are not whitespaces.
 
-  if ispc
-    [status, LIB_PATH] = reduce_path(LIB_PATH);
-    if status; error('mex:compile', 'Unable to recognize path'); end
-    LIB_PATH = strtrim(LIB_PATH);
+  if ispc % Windows
+    LIB_PATH = reducepath(LIB_PATH);
   end
 
   BUILD_FUNCTION = @(file) eval(['mex -largeArrayDims -O ', ZMQ_COMPILE_FLAGS, sprintf(' "%s" -outdir %s', file, LIB_PATH)]);
   cellfun(BUILD_FUNCTION, CORE_FILE_LIST);
+end
+
+function red_path = reducepath(orig_path)
+  [status, red_path] = system(['for %A in ("', orig_path ,'") do @echo %~sA']);
+  if status; error('system:reducepath', 'Unable to recognize path'); end
+  red_path = strtrim(red_path);
 end
