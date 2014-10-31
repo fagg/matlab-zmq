@@ -7,6 +7,11 @@ void core_getsockopt(void *, char *, void *, size_t *);
 
 void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 {
+    void **socketPtr;
+    void *coreAPIReturn;
+    size_t coreAPIReturnSz;
+    char *optionName;
+
     if (nrhs != 3) {
         mexErrMsgIdAndTxt("zmq:getsockopts:invalidArgs",
                 "Error: Two arguments are required: socket, option_name");
@@ -20,10 +25,10 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
                 "Error: option_name is not a row vector.");
     }
 
-    void **socketPtr = (void **) mxGetData(prhs[0]);
-    void *coreAPIReturn;
-    size_t coreAPIReturnSz;
-    char *optionName = get_option_name(prhs[1]);
+    socketPtr = (void **) mxGetData(prhs[0]);
+    coreAPIReturn;
+    coreAPIReturnSz;
+    optionName = get_option_name(prhs[1]);
 
     core_getsockopt(*socketPtr, optionName, coreAPIReturn, &coreAPIReturnSz);
 
@@ -32,8 +37,12 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 
 char *get_option_name(const mxArray *param)
 {
-    int optLen = mxGetM(param) * mxGetN(param) + 1;
-    char *ret = (char *) mxCalloc(optLen, sizeof(char));
+    int optLen;
+    char *ret;
+
+    optLen = (int) mxGetM(param) * mxGetN(param) + 1;
+    ret = (char *) mxCalloc(optLen, sizeof(char));
+
     if (mxGetString(param, ret, optLen) != 0) {
         mexErrMsgIdAndTxt("zmq:getsockopts:optNameCopyFail",
                 "Error: Couldn't get option_name as string.");
@@ -43,7 +52,7 @@ char *get_option_name(const mxArray *param)
 
 void core_getsockopt(void *socket, char *optionName, void *coreAPIReturn, size_t *coreAPIReturnSz)
 {
-    int optSel;
+    int optSel, rc ;
 
     if (!strcmp(optionName, "ZMQ_TYPE"))
         optSel = ZMQ_TYPE;
@@ -119,7 +128,7 @@ void core_getsockopt(void *socket, char *optionName, void *coreAPIReturn, size_t
                 "Error: socket_option is invalid.");
     }
 
-    int rc = zmq_getsockopt(socket, optSel, coreAPIReturn, coreAPIReturnSz);
+    rc = zmq_getsockopt(socket, optSel, coreAPIReturn, coreAPIReturnSz);
 
     if (rc < 0) {
         mxFree(optionName);
