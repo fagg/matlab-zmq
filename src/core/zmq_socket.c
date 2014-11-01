@@ -92,7 +92,7 @@ void *core_socket(const mxArray *params[])
     }
 
     coreAPIReturn = zmq_socket(*contextPtr, sockTypeVal);
-/* DEBUG */ printf("Open socket pointer: %p\n", coreAPIReturn);
+/*DEBUG*/ printf("(%s, %d):\n\tSocket pointer: %p\n", __FILE__, __LINE__, coreAPIReturn);
     if (coreAPIReturn == NULL) {
         err = errno;
         /* Windows users can have problems with errno, see http://api.zeromq.org/4-0:zmq-errno */
