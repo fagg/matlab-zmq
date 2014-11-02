@@ -24,17 +24,19 @@ typedef struct _sopt_desc {
 typedef struct _sopt_type_desc {
     int id;
     size_t maxlen;
-    mxArray* (*to_m)(void* handler, size_t m, size_t n);
+    mxArray* (*to_m)(void* handler);
 } zmq_sockopt_type_t;
 
 /*
   Information used to construct this table can found in:
-  - http://api.zeromq.org/4-0:zmq-getsockopt
-  - http://api.zeromq.org/4-0:zmq-setsockopt
+  - http://api.zeromq.org/master:zmq-getsockopt
+  - http://api.zeromq.org/master:zmq-setsockopt
+  - https://github.com/zeromq/czmq/blob/master/src/sockopts.xml
 
-  TODO: Maybe is possible to use imatix/gsl in combination with
-  https://github.com/zeromq/czmq/blob/master/src/sockopts.xml file, to generate
-  this table automatically ...
+  WARNING: Option type seems to depend on ZMQ version, and documentation is not
+  100% reliable.
+
+  TODO:generate this table automatically using iMatix gsl...
  */
 static const zmq_sockopt_desc_t sockopt_array[] = {
     {ZMQ_TYPE                , "ZMQ_TYPE"                , SOPT_INT   } ,
@@ -66,9 +68,9 @@ static const zmq_sockopt_desc_t sockopt_array[] = {
  see http://jpassing.com/2011/05/02/ifdef-_win32
  http://msdn.microsoft.com/en-us/library/b0084kay.aspx
 */
-    {ZMQ_FD                  , "ZMQ_FD"                  , SOPT_INT   } ,
-#else
     {ZMQ_FD                  , "ZMQ_FD"                  , SOPT_SOCKET} ,
+#else
+    {ZMQ_FD                  , "ZMQ_FD"                  , SOPT_INT   } ,
 #endif
     {ZMQ_EVENTS              , "ZMQ_EVENTS"              , SOPT_INT   } ,
     {ZMQ_LAST_ENDPOINT       , "ZMQ_LAST_ENDPOINT"       , SOPT_STRING} ,
@@ -99,19 +101,18 @@ static const zmq_sockopt_desc_t sockopt_array[] = {
 
 mxArray* uint64_matrix_to_m(void* handler, size_t m, size_t n) {
     mxArray* ret;
-    uint64_t** value;
-    void** pointer;
+    uint64_t* input;
+    uint64_t* output;
     int i, j;
 
-    value = (uint64_t**) handler;
+    input = (uint64_t*) handler;
 
     ret = mxCreateNumericMatrix(m, n, mxUINT64_CLASS, mxREAL);
-    pointer = mxGetPr(ret);
+    output = (uint64_t*) mxGetData(ret);
 
-    for (i = 0; i < n; i++) {
-        for (j = 0; j < m; j++) {
-            printf("m: %d, n: %d, d: %d\n", i, j, *(value+n*j+i));
-            *(pointer+n*j+i) = *(value+n*j+i);
+    for (i = 0; i < m; i++) {
+        for (j = 0; j < n; j++) {
+            output[j*m + i] = (uint64_t) input[i*n + j];
         }
     }
 
@@ -120,18 +121,18 @@ mxArray* uint64_matrix_to_m(void* handler, size_t m, size_t n) {
 
 mxArray* int64_matrix_to_m(void* handler, size_t m, size_t n) {
     mxArray* ret;
-    int64_t** value;
-    void** pointer;
+    int64_t* input;
+    int64_t* output;
     int i, j;
 
-    value = (int64_t**) handler;
+    input = (int64_t**) handler;
 
-    ret = mxCreateNumericMatrix(m, n, mxUINT64_CLASS, mxREAL);
-    pointer = mxGetPr(ret);
+    ret = mxCreateNumericMatrix(m, n, mxINT64_CLASS, mxREAL);
+    output = (int64_t*) mxGetData(ret);
 
     for (i = 0; i < m; i++) {
         for (j = 0; j < n; j++) {
-            *(pointer+i+j) = *(value+i+j);
+            output[j*m + i] = (int64_t) input[i*n + j];
         }
     }
 
@@ -140,38 +141,39 @@ mxArray* int64_matrix_to_m(void* handler, size_t m, size_t n) {
 
 mxArray* uint32_matrix_to_m(void* handler, size_t m, size_t n) {
     mxArray* ret;
-    uint32_t** value;
-    void** pointer;
+    uint32_t* input;
+    uint32_t* output;
     int i, j;
 
-    value = (uint32_t**) handler;
+    input = (uint32_t*) handler;
 
-    ret = mxCreateNumericMatrix(m, n, mxUINT64_CLASS, mxREAL);
-    pointer = mxGetPr(ret);
+    ret = mxCreateNumericMatrix(m, n, mxUINT32_CLASS, mxREAL);
+    output = (uint32_t*) mxGetData(ret);
 
     for (i = 0; i < m; i++) {
         for (j = 0; j < n; j++) {
-            *(pointer+i+j) = *(value+i+j);
+            output[j*m + i] = (uint32_t) input[i*n + j];
         }
     }
 
     return ret;
 }
 
+/* TODO: discover the exact size of platform default int */
 mxArray* int_matrix_to_m(void* handler, size_t m, size_t n) {
     mxArray* ret;
-    int** value;
-    void** pointer;
+    int* input;
+    int32_t* output;
     int i, j;
 
-    value = (int**) handler;
+    input = (int*) handler;
 
-    ret = mxCreateNumericMatrix(m, n, mxUINT64_CLASS, mxREAL);
-    pointer = mxGetPr(ret);
+    ret = mxCreateNumericMatrix(m, n, mxINT32_CLASS, mxREAL);
+    output = (int32_t*) mxGetData(ret);
 
     for (i = 0; i < m; i++) {
         for (j = 0; j < n; j++) {
-            *(pointer+i+j) = *(value+i+j);
+            output[j*m + i] = (int32_t) input[i*n + j];
         }
     }
 
@@ -335,8 +337,6 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     size_t api_return_len;
     int rc, err;
 
-    uint64_t vec[2][2] = {{0,1},{2,3}};
-
     if (nrhs != 2) {
         mexErrMsgIdAndTxt("zmq:getsockopts:invalidArgs",
                 "Error: Two arguments are required: socket, option");
@@ -362,13 +362,11 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 
     typedesc = sockopt_find_type(optdesc->type_id);
     if (typedesc == NULL) return;
-/*DEBUG*/ printf("(%s, %d):\n\tOption %s, length: %d\n", __FILE__, __LINE__, optdesc->name, typedesc->maxlen); //return;
 
     mxFree(option);
 
     mexParam = (void**) mxGetData(prhs[0]);
     socket = mexParam[0];
-/*DEBUG*/ printf("(%s, %d):\n\tSocket pointer: %p\n", __FILE__, __LINE__, socket);
 
     api_return_len = typedesc->maxlen;
     api_return = (void*) mxMalloc(api_return_len);
@@ -383,8 +381,9 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 
     if (rc < 0) {
         socket_error();
+        mxFree(api_return);
         return;
     }
 
-    plhs[0] = uint64_matrix_to_m((void*) vec, 2, 2);
+    plhs[0] = typedesc->to_m(api_return);
 }
