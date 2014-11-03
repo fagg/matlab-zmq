@@ -64,4 +64,5 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     }
 
     plhs[0] = typedesc->to_m(api_return);
+    mxFree(api_return);
 }

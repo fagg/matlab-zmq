@@ -1,56 +1,76 @@
-function make(varargin)
-% make.m
-%
-% Tools for building matlab API for ZMQ.
-%
-% ## USAGE:
-%
-% ```matlab
-% >> make % This will build all the core API
-% >> make zmq_version.c zmq_ctx_new.c % This will build only the listed files
-% >> make clean % Remove files produced by compilation process
-% ```
-%
-% ## NOTICE:
-%
-% Before runnig this, make sure to install ZMQ and edit 'config.m' file.
-%
-% Instructions for installing ZMQ: http://zeromq.org/intro:get-the-software.
-%
-% The files 'config_win.m', 'config_unix.m' are examples of how to edit
-% 'config.m' for different operating systems.
-%
-% The file 'config.m' itself shows how to build `matlab-zmq` using a Homebrew
-% instalation of ZMQ 4.0.4 for OS-X.
+function success = make(varargin)
+  % make.m
+  %
+  % Tools for building matlab API for ZMQ.
+  %
+  % ## USAGE:
+  %
+  % ```matlab
+  % >> make % This will build all the core API
+  % >> make zmq_version.c zmq_ctx_new.c % This will build only the listed files
+  % >> make clean % Remove files produced by compilation process
+  % ```
+  %
+  % ## NOTICE:
+  %
+  % Before runnig this, make sure to install ZMQ and edit 'config.m' file.
+  %
+  % Instructions for installing ZMQ: http://zeromq.org/intro:get-the-software.
+  %
+  % The files 'config_win.m', 'config_unix.m' are examples of how to edit
+  % 'config.m' for different operating systems.
+  %
+  % The file 'config.m' itself shows how to build `matlab-zmq` using a Homebrew
+  % instalation of ZMQ 4.0.4 for OS-X.
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   %% Make Rules
   if nargin > 0
     switch lower(varargin{1})
       case 'clean'
-        clean(varargin{2:end});
+        success = clean(varargin{2:end});
+      case 'test'
+        success = run_tests(varargin{2:end});
       case {'build', 'compile'}
-        build(varargin{2:end});
+        success = build(varargin{2:end});
       otherwise
-        build(varargin{:});
+        success = build(varargin{:});
     end
   else
-    build;
+    success = build;
   end
 end
 
 %% Make rules
 
-function clean(varargin)
+function success = clean(varargin)
+  success = false;
+
   [make_path, lib_path, ~, ~] = get_paths;
-  delete(fullfile(lib_path, '*.mex*'));
-  delete(fullfile(make_path, '*.o'));
-  delete(fullfile(make_path, '*.asv'));
-  delete(fullfile(make_path, '*.m~'));
+  if ~isempty(dir(fullfile(lib_path, '*.mex*'))); delete(fullfile(lib_path, '*.mex*')); end
+  if ~isempty(dir(fullfile(lib_path, '*.mex*'))); delete(fullfile(make_path, '*.o')); end
+  if ~isempty(dir(fullfile(lib_path, '*.mex*'))); delete(fullfile(make_path, '*.asv')); end
+  if ~isempty(dir(fullfile(lib_path, '*.mex*'))); delete(fullfile(make_path, '*.m~')); end
+
+  success = true;
 end
 
-function build(varargin)
-  [~, lib_path, src_path, ~] = get_paths;
+function success = run_tests(varargin)
+  [~, lib_path ~, test_path] = get_paths;
+
+  % save current path
+  original_path = path;
+  addpath(test_path);
+  addpath(lib_path);
+
+  success = runner(varargin{:});
+
+  % restore path
+  path(original_path);
+end
+
+function success = build(varargin)
+  [make_path, lib_path, src_path, ~] = get_paths;
 
   %% ZMQ CONFIGURATION:
   % Try manual config first
@@ -103,17 +123,19 @@ function build(varargin)
 
   build_function = @(file) compile(zmq_compile_flags, file, lib_path);
   cellfun(build_function, COMPILE_LIST);
+  delete(fullfile(make_path, '*.o'));
 
-  files = ls(fullfile(lib_path, '*.mex*'));
+  files = dir(fullfile(lib_path, '*.mex*'));
   if size(files, 1) == length(COMPILE_LIST)
+    success = true;
     fprintf('\nSuccesful build for:\n');
   else
+    success = false;
     fprintf('\nErrors during build for:\n');
   end
   fprintf(...
     '\tZMQ_INCLUDE_PATH = %s\n\tZMQ_LIB_PATH = %s\n\tZMQ_COMPILED_LIB = %s\n\n', ...
     orig_zmq_include_path, orig_zmq_lib_path, orig_zmq_lib);
-
 end
 
 %% Auxiliar functions
@@ -190,7 +212,7 @@ function response = testzmq(folder)
   % Test if there are any zmq files inside folder
 
   try
-    files = ls(fullfile(folder, '*zmq*'));
+    files = dir(fullfile(folder, '*zmq*'));
   catch
     files = [];
   end

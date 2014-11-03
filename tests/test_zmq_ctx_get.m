@@ -3,18 +3,19 @@ function test_zmq_ctx_get
 
   % ZMQ_IO_THREADS Default Value: 1
   nthreads = zmq_ctx_get(ctx, 'ZMQ_IO_THREADS');
-  assertTrue(nthreads == 1);
+  assert(nthreads == 1, 'ZMQ_IO_THREADS should be 1, %d given.', nthreads);
 
   % ZMQ_IPV6 Default Value: 0
   ipv6 = zmq_ctx_get(ctx, 'ZMQ_IPV6');
-  assertTrue(ipv6 == 0);
+  assert(ipv6 == 0, 'ZMQ_IPV6 should be 0, %d given.', ipv6);
 
   % ZMQ_MAX_SOCKETS Default Value: 1024
   maxs = zmq_ctx_get(ctx, 'ZMQ_MAX_SOCKETS');
-  assertTrue(maxs == 1024);
+  assert(maxs == 1024 || maxs == 1023, 'ZMQ_MAX_SOCKETS should be 1024, %d given (I suspect receiving 1023 is OK).', maxs);
+
   % NOTICE:
   % According to documentation (http://api.zeromq.org/4-0:zmq-ctx-set)
-  % it should be 1024, but I suspect receiving 1023 is OK...
+  % it should be 1024, but `zmq.h` defines it as 1023...
 
   zmq_ctx_shutdown(ctx);
   zmq_ctx_term(ctx);
