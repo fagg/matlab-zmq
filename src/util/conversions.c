@@ -88,7 +88,7 @@ mxArray* uint64_to_m(void* handler) {
 }
 
 mxArray* int64_to_m(void* handler) {
-    return uint64_matrix_to_m(handler, 1, 1);
+    return int64_matrix_to_m(handler, 1, 1);
 }
 
 mxArray* uint32_to_m(void* handler) {
