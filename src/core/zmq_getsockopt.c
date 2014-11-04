@@ -1,5 +1,5 @@
-#include <util/sockopt.h>
 #include <util/socket.h>
+#include <util/sockopt.h>
 #include <util/conversions.h>
 #include <mex.h>
 #include <zmq.h>

@@ -13,7 +13,7 @@ following:
 Getting Started
 ---------------
 + Make sure you have ZMQ 4.0.4 installed. Change settings in `config.m` to point to your installation.
-+ Ensure you have mex configured [1](http://www.mathworks.com/help/matlab/matlab_external/what-you-need-to-build-mex-files.html) [2](http://www.mathworks.com/support/compilers/R2014b/index.html)
++ Ensure you have mex configured [[1]](http://www.mathworks.com/help/matlab/matlab_external/what-you-need-to-build-mex-files.html) [[2]](http://www.mathworks.com/support/compilers/R2014b/index.html)
 + Run `make.m`
 
 Can I help?

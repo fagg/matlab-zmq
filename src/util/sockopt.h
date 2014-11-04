@@ -11,6 +11,8 @@ enum {
     SOPT_INT,
     SOPT_STRING,
     SOPT_KEY,
+    SOPT_SOCKTYPE,
+    SOPT_MECHANISM,
 #if defined _WIN32
     SOPT_SOCKET,
 #endif
@@ -46,7 +48,22 @@ typedef struct _sopt_type_desc {
     mxArray* (*to_m)(void* handler);
 } zmq_sockopt_type_t;
 
+/*
+  Struct with metadata fields, used to interpret security mechanism.
+
+  The field `id` is the constant defined in `zmq.h`.
+  The field `name` is the string representing this constant.
+ */
+typedef struct _sopt_mechanism_desc {
+    int id;
+    const char* name;
+} zmq_sockopt_mechanism_t;
+
 const zmq_sockopt_desc_t* sockopt_find_by_name(char* option);
 const zmq_sockopt_type_t* sockopt_find_type(int type_id);
+const zmq_sockopt_mechanism_t* sockopt_find_mechanism_by_id(int mechanism_id);
+
+/* Extra conversions CONST => STRING */
+mxArray* mechanism_to_m(void* handler) ;
 
 #endif
