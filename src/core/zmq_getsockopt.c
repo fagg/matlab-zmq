@@ -9,7 +9,6 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     void* socket = NULL;
     char* option = NULL;
     void* api_return = NULL;
-    void** mexParam = NULL;
     const zmq_sockopt_desc_t* optdesc = NULL;
     const zmq_sockopt_type_t* typedesc = NULL;
     size_t api_return_len;
@@ -43,8 +42,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 
     mxFree(option);
 
-    mexParam = (void**) mxGetData(prhs[0]);
-    socket = (void*) mexParam[0];
+    socket = pointer_from_m(prhs[0]);
 
     api_return_len = typedesc->maxlen;
     api_return = (void*) mxMalloc(api_return_len);

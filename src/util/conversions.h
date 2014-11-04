@@ -16,5 +16,6 @@ mxArray* str_to_m(void* handler);
 mxArray* pointer_to_m(void* handler);
 
 void* str_from_m(const mxArray* param);
+void* pointer_from_m(const mxArray* param);
 
 #endif

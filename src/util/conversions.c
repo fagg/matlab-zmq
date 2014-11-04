@@ -139,3 +139,13 @@ void* str_from_m(const mxArray* param) {
 
     return (void*) str;
 }
+
+void* pointer_from_m(const mxArray* param) {
+    void** input = NULL;
+    void* output = NULL;
+
+    input = (void**) mxGetData(param);
+    output = (void*) input[0];
+
+    return output;
+}
