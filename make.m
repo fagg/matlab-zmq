@@ -17,14 +17,14 @@ function success = make(varargin)
   %
   % Instructions for installing ZMQ: http://zeromq.org/intro:get-the-software.
   %
-  % The files 'config_win.m', 'config_unix.m' are examples of how to edit
-  % 'config.m' for different operating systems.
+  % The files `config_win.m` and `config_unix.m` are examples of how to edit
+  % `config.m` for different operating systems.
   %
-  % The file 'config.m' itself shows how to build `matlab-zmq` using a Homebrew
+  % The file `config.m` itself shows how to build `matlab-zmq` using a Homebrew
   % instalation of ZMQ 4.0.4 for OS-X.
 
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-  %% Make Rules
+  %% Rules
   if nargin > 0
     switch lower(varargin{1})
       case 'clean'
@@ -44,18 +44,45 @@ end
 %% Make rules
 
 function success = clean(varargin)
+  % Remove the files generated during compilation process.
+  %
+  % Arguments:
+  %  - [...]: Variable list of paths to be deleted, relative to this file.
+  %           No recursive glob patterns can be used.
+  %
+  % If no argument is provided, all 'lib/*.mex*', '*.o', '*.asv', '*.m~' files
+  % will be remvoed.
+  %
+  % NOTICE: Without arguments, it will purge the created bindings.
   success = false;
 
-  [make_path, lib_path, ~, ~] = get_paths;
-  if ~isempty(dir(fullfile(lib_path, '*.mex*'))); delete(fullfile(lib_path, '*.mex*')); end
-  if ~isempty(dir(fullfile(lib_path, '*.mex*'))); delete(fullfile(make_path, '*.o')); end
-  if ~isempty(dir(fullfile(lib_path, '*.mex*'))); delete(fullfile(make_path, '*.asv')); end
-  if ~isempty(dir(fullfile(lib_path, '*.mex*'))); delete(fullfile(make_path, '*.m~')); end
+  [make_path, ~, ~, ~] = get_paths;
+  if nargin > 0
+    rubish = varargin;
+  else
+    rubish = {'lib/*.mex*', '*.o', '*.asv', '*.m~'};
+  end
+
+  for n = 1:length(rubish)
+    pattern = fullfile(make_path, rubish{n});
+    try
+      if ~isempty(dir(pattern)); delete(pattern); end
+    end
+  end
 
   success = true;
 end
 
 function success = run_tests(varargin)
+  % Run tests for the library
+  %
+  % ## Arguments
+  %   - [...]: variable list of tests.
+  %
+  % If no argument is provided, all the files `test*.m` under `tests` dir will
+  % run.
+  %
+  % Notice that the files will be considered relative to `tests` directory.
   [~, lib_path ~, test_path] = get_paths;
 
   % save current path
@@ -70,6 +97,21 @@ function success = run_tests(varargin)
 end
 
 function success = build(varargin)
+  % Build core ZMQ bindings
+  %
+  % ## Arguments
+  %   - [...]: variable list of files to be compiled.
+  %
+  % If no argument is provided, the list will be loaded from `compile_list.m`
+  % file.
+  %
+  % Notice that the files will be considered relative to `src/core` directory.
+  %
+  % Instead of a plain string, a cell array of strings can be also used as
+  % argument. In this case, the first string is the _main_ file
+  % (relative to `src/core` directory), while the others are _dependencies_
+  % (relative to `src`).
+
   [make_path, lib_path, src_path, ~] = get_paths;
 
   %% ZMQ CONFIGURATION:
@@ -123,9 +165,10 @@ function success = build(varargin)
 
   build_function = @(file) compile(zmq_compile_flags, file, lib_path);
   cellfun(build_function, COMPILE_LIST);
-  delete(fullfile(make_path, '*.o'));
 
-  files = dir(fullfile(lib_path, '*.mex*'));
+  clean('*.o');
+
+  files = ls(fullfile(lib_path, '*.mex*'));
   if size(files, 1) == length(COMPILE_LIST)
     success = true;
     fprintf('\nSuccesful build for:\n');
@@ -141,6 +184,7 @@ end
 %% Auxiliar functions
 
 function compile(flags, file, outputdir)
+  % Compile files
   [~, ~, src_path, ~] = get_paths;
 
   deps = {};
@@ -225,6 +269,8 @@ function response = testzmq(folder)
 end
 
 function [make_path, lib_path, src_path, test_path] = get_paths
+  % Return the paths used for this library
+
   [make_path, ~, ~] = fileparts(mfilename('fullpath'));
   lib_path = fullfile(make_path, 'lib');
   src_path = fullfile(make_path, 'src');

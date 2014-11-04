@@ -1,5 +1,9 @@
 function test_zmq_ctx_get
+  % let's just create a dummy context
   ctx = zmq_ctx_new();
+
+  % Once the context is fresh and unused, all the options should remain with the
+  % default values.
 
   % ZMQ_IO_THREADS Default Value: 1
   nthreads = zmq_ctx_get(ctx, 'ZMQ_IO_THREADS');
@@ -11,12 +15,14 @@ function test_zmq_ctx_get
 
   % ZMQ_MAX_SOCKETS Default Value: 1024
   maxs = zmq_ctx_get(ctx, 'ZMQ_MAX_SOCKETS');
-  assert(maxs == 1024 || maxs == 1023, 'ZMQ_MAX_SOCKETS should be 1024, %d given (I suspect receiving 1023 is OK).', maxs);
+  assert(maxs == 1024 || maxs == 1023, ...
+    'ZMQ_MAX_SOCKETS should be 1024, %d given (I suspect receiving 1023 is OK).', maxs);
 
   % NOTICE:
   % According to documentation (http://api.zeromq.org/4-0:zmq-ctx-set)
   % it should be 1024, but `zmq.h` defines it as 1023...
 
+  % close session
   zmq_ctx_shutdown(ctx);
   zmq_ctx_term(ctx);
 end

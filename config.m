@@ -1,7 +1,10 @@
-% Please edit this file with the correct paths for ZMQ files.
-% Examples can be found in files 'config_unix.m', 'config_win.m'
+% Please edit this file with the correct paths for ZMQ instalation.
+%
+% Examples can be found in files `config_unix.m`, `config_win.m`.
+% This file itself shows how to build `matlab-zmq` using a Homebrew
+% instalation of ZMQ 4.0.4 for OS-X.
 
-% The filename for the compiled lib without prefix
+% The filename for the compiled lib (binary file)
 ZMQ_COMPILED_LIB = 'libzmq.a';
 
 % Where is the compiled lib placed?

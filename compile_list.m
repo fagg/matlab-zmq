@@ -1,3 +1,11 @@
+% List of files to be compiled
+%
+% A simple string entry indicates that are no dependencies.
+%
+% If a entry of type `cell` (nested list) is found, the first string represents
+% the __main__ file, and the others represent dependencies to be compiled
+% together with the __main__ file.
+
 COMPILE_LIST = { ...
   'zmq_version.c', ...
   'zmq_ctx_new.c', ...

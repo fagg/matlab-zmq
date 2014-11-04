@@ -1,7 +1,9 @@
 function test_zmq_getsockopt
+  % let's just create a dummy socket
   ctx = zmq_ctx_new();
   socket = zmq_socket(ctx, 'ZMQ_REP');
 
+  % Table with the default values for options
   default_options = { ...
   ... % {'ZMQ_TYPE'                , 'ZMQ_REP' } , ... % not implemented yet
     {'ZMQ_RCVMORE'             , 0         } , ...
@@ -31,6 +33,11 @@ function test_zmq_getsockopt
   ... %  {'ZMQ_MAXMSGSIZE'          , -1        } , ... % something strange is happening
   };
 
+  % This loop will test all the socket options against the default values listed
+  % above.
+  %
+  % Once the socket is fresh and unused, all the options should remain with the
+  % default values.
   for n = 1:(length(default_options)-1)
     option = default_options{n}{1};
     value = default_options{n}{2};
@@ -49,6 +56,7 @@ function test_zmq_getsockopt
     assert(condition, '%s should be %s, %s given.', option, value, response);
   end
 
+  % close session
   zmq_ctx_shutdown(ctx);
   %zmq_ctx_term(ctx); % once ZMQ_LINGER is set to -1 by default, `zmq_ctx_term`
                       % will block until socket is closed, but this operation is
