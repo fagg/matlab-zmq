@@ -4,8 +4,8 @@
 
 void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 {
-    int minor, major, patch, buflen = 50;
-    char *output_buf;
+    int minor, major, patch, bufLen = 50;
+    char *outputBuf;
 
     zmq_version(&major, &minor, &patch);
 
@@ -14,8 +14,8 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     } else if (nlhs > 1) {
       mexErrMsgTxt("Too many output arguments.");
     } else {
-      output_buf = mxCalloc(buflen, sizeof(char));
-      sprintf(output_buf, "%d.%d.%d", major, minor, patch);
-      plhs[0] = mxCreateString(output_buf);
+      outputBuf = mxCalloc(bufLen, sizeof(char));
+      sprintf(outputBuf, "%d.%d.%d", major, minor, patch);
+      plhs[0] = mxCreateString(outputBuf);
     }
 }
