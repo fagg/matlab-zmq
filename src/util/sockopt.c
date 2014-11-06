@@ -9,7 +9,7 @@
 
   The field `id` is the constant defined in `zmq.h`.
   The field `name` is the string representing this constant.
-  The field `type_id` is a constant, describing the type for option value,
+  The field `typeId` is a constant, describing the type for option value,
   e.g. utin64, string, etc...
 
   Information used to construct this table can found in:
@@ -21,7 +21,7 @@
   100% reliable.
   TODO:generate this table automatically using iMatix gsl...
  */
-static const zmq_sockopt_desc_t sockopt_lookup[] = {
+static const zmq_sockopt_desc_t sockOptLookup[] = {
     {ZMQ_TYPE                , "ZMQ_TYPE"                , SOPT_SOCKTYPE  } ,
     {ZMQ_RCVMORE             , "ZMQ_RCVMORE"             , SOPT_INT       } ,
     {ZMQ_SNDHWM              , "ZMQ_SNDHWM"              , SOPT_INT       } ,
@@ -86,12 +86,12 @@ static const zmq_sockopt_desc_t sockopt_lookup[] = {
   Lookup table with metadata used to interpret/convert socket option types.
 
   The field `id` is a constant, identifying the type.
-  The field `maxlen` is the maximum number of bytes that can be used for the
+  The field `maxLen` is the maximum number of bytes that can be used for the
   option.
   The field `to_m` is a function pointer, that can be used to convert from C
   value to MATLAB.
  */
-static const zmq_sockopt_type_t sockopt_type_lookup[] = {
+static const zmq_sockopt_type_t sockOptTypeLookup[] = {
     {SOPT_UINT64   , sizeof(uint64_t) , uint64_to_m   },
     {SOPT_INT64    , sizeof(int64_t)  , int64_to_m    },
     {SOPT_UINT32   , sizeof(uint32_t) , uint32_to_m   },
@@ -112,7 +112,7 @@ static const zmq_sockopt_type_t sockopt_type_lookup[] = {
   The field `id` is the constant defined in `zmq.h`.
   The field `name` is the string representing this constant.
  */
-static const zmq_sockopt_mechanism_t sockopt_mechanism_lookup[] = {
+static const zmq_sockopt_mechanism_t sockOptMechanismLookup[] = {
     {ZMQ_NULL , "ZMQ_NULL" } ,
     {ZMQ_PLAIN, "ZMQ_PLAIN"} ,
     {ZMQ_CURVE, "ZMQ_CURVE"} ,
@@ -128,97 +128,97 @@ static const zmq_sockopt_mechanism_t sockopt_mechanism_lookup[] = {
   ## Return
   Pointer to a struct with metada (`zmq_sockopt_desc_t`)
  */
-const zmq_sockopt_desc_t* sockopt_find_by_name(char* option) {
+const zmq_sockopt_desc_t* find_sockopt_by_name(char* option) {
     int i;
-    const zmq_sockopt_desc_t* decriptor = NULL;
+    const zmq_sockopt_desc_t* descriptor = NULL;
 
     /*
-      TODO: as `sockopt_lookup` table order can be chosen arbitrarily,
+      TODO: as `sockOptLookup` table order can be chosen arbitrarily,
       we can use binary search to speed up this process.
      */
-    for (i = 0; sockopt_lookup[i].name != NULL; i++) {
-        if (!strcmp(option, sockopt_lookup[i].name)) {
-            decriptor = &(sockopt_lookup[i]);
+    for (i = 0; sockOptLookup[i].name != NULL; i++) {
+        if (!strcmp(option, sockOptLookup[i].name)) {
+            descriptor = &(sockOptLookup[i]);
             break;
         }
     }
 
-    if (decriptor == NULL) {
+    if (descriptor == NULL) {
         mexErrMsgIdAndTxt("zmq:sockopt:invalidOptionName",
             "Error: socket_option %s is invalid.", option);
     }
-    return decriptor;
+    return descriptor;
 }
 
 /*
   Find the metadata related to the socket option type.
 
   ## Arguments
-    - type_id: integer identifying the option type, e.g. SOPT_INT64, SOPT_INT, ...
+    - typeId: integer identifying the option type, e.g. SOPT_INT64, SOPT_INT, ...
 
   ## Return
   Pointer to a struct with metada (`zmq_sockopt_type_t`)
  */
-const zmq_sockopt_type_t* sockopt_find_type(int type_id) {
+const zmq_sockopt_type_t* find_sockopt_type_by_id(int typeId) {
     int i;
-    const zmq_sockopt_type_t* decriptor = NULL;
+    const zmq_sockopt_type_t* descriptor = NULL;
 
     /*
-      TODO: as `type_id` values can be chosen arbitrarily, as well as
-      sockopt_type_lookup table order, we can use binary search to speed up this
+      TODO: as `typeId` values can be chosen arbitrarily, as well as
+      sockOptTypeLookup table order, we can use binary search to speed up this
       process. Although, the table is small...
      */
-    for (i = 0; sockopt_type_lookup[i].id != SOPT_INVALID; i++) {
-        if (type_id == sockopt_type_lookup[i].id) {
-            decriptor = &(sockopt_type_lookup[i]);
+    for (i = 0; sockOptTypeLookup[i].id != SOPT_INVALID; i++) {
+        if (typeId == sockOptTypeLookup[i].id) {
+            descriptor = &(sockOptTypeLookup[i]);
             break;
         }
     }
-    if (decriptor == NULL) {
+    if (descriptor == NULL) {
         mexErrMsgIdAndTxt("zmq:sockopt:invalidOptionTypeId",
-            "Error: socket_option type_id %d is invalid.", type_id);
+            "Error: socket_option typeId %d is invalid.", typeId);
     }
-    return decriptor;
+    return descriptor;
 }
 
 /*
   Find the metadata related to the socket security mechanism.
 
   ## Arguments
-    - mechanism_id: integer identifying the option type, e.g. SOPT_INT64, SOPT_INT, ...
+    - mechanismId: integer identifying the option type, e.g. SOPT_INT64, SOPT_INT, ...
 
   ## Return
   Pointer to a struct with metada (`zmq_sockopt_type_t`)
  */
-const zmq_sockopt_mechanism_t* sockopt_find_mechanism_by_id(int mechanism_id) {
+const zmq_sockopt_mechanism_t* find_sockopt_mechanism_by_id(int mechanismId) {
     int i;
-    const zmq_sockopt_mechanism_t* decriptor = NULL;
+    const zmq_sockopt_mechanism_t* descriptor = NULL;
 
     /*
-      TODO: as `type_id` values can be chosen arbitrarily, as well as
-      sockopt_type_lookup table order, we can use binary search to speed up this
+      TODO: as `typeId` values can be chosen arbitrarily, as well as
+      sockOptTypeLookup table order, we can use binary search to speed up this
       process. Although, the table is small...
      */
-    for (i = 0; sockopt_mechanism_lookup[i].name != NULL; i++) {
-        if (mechanism_id == sockopt_mechanism_lookup[i].id) {
-            decriptor = &(sockopt_mechanism_lookup[i]);
+    for (i = 0; sockOptMechanismLookup[i].name != NULL; i++) {
+        if (mechanismId == sockOptMechanismLookup[i].id) {
+            descriptor = &(sockOptMechanismLookup[i]);
             break;
         }
     }
-    if (decriptor == NULL) {
+    if (descriptor == NULL) {
         mexErrMsgIdAndTxt("zmq:sockopt:invalidOptionMechanismId",
-            "Error: socket_option mechanism %d is invalid.", mechanism_id);
+            "Error: socket_option mechanism %d is invalid.", mechanismId);
     }
-    return decriptor;
+    return descriptor;
 }
 
 /* Custom CONSTANT <=> STRING convertions */
 
-mxArray* mechanism_to_m(void* handler) {
+mxArray* mechanism_to_m(void* handle) {
     mxArray* ret;
     const zmq_sockopt_mechanism_t* mechanism = NULL;
 
-    mechanism = sockopt_find_mechanism_by_id(*((int*) handler));
+    mechanism = find_sockopt_mechanism_by_id(*((int*) handle));
     if (mechanism != NULL) ret = (mxArray*) str_to_m((void*) mechanism->name);
 
     return ret;

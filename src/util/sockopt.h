@@ -24,28 +24,28 @@ enum {
 
   The field `id` is the constant defined in `zmq.h`.
   The field `name` is the string representing this constant.
-  The field `type_id` is a constant, describing the type for option value,
+  The field `typeId` is a constant, describing the type for option value,
   e.g. utin64, string, etc...
  */
 typedef struct _sopt_desc {
     int id;
     const char* name;
-    int type_id;
+    int typeId;
 } zmq_sockopt_desc_t;
 
 /*
   Struct with metadata fields, used to interpret socket option types.
 
   The field `id` is a constant, identifying the type.
-  The field `maxlen` is the maximum number of bytes that can be used for the
+  The field `maxLen` is the maximum number of bytes that can be used for the
   option.
   The field `to_m` is a function pointer, that can be used to convert from C
   value to MATLAB.
  */
 typedef struct _sopt_type_desc {
     int id;
-    size_t maxlen;
-    mxArray* (*to_m)(void* handler);
+    size_t maxLen;
+    mxArray* (*to_m)(void* handle);
 } zmq_sockopt_type_t;
 
 /*
@@ -59,11 +59,11 @@ typedef struct _sopt_mechanism_desc {
     const char* name;
 } zmq_sockopt_mechanism_t;
 
-const zmq_sockopt_desc_t* sockopt_find_by_name(char* option);
-const zmq_sockopt_type_t* sockopt_find_type(int type_id);
-const zmq_sockopt_mechanism_t* sockopt_find_mechanism_by_id(int mechanism_id);
+const zmq_sockopt_desc_t* find_sockopt_by_name(char* option);
+const zmq_sockopt_type_t* find_sockopt_type_by_id(int typeId);
+const zmq_sockopt_mechanism_t* find_sockopt_mechanism_by_id(int mechanismId);
 
 /* Extra conversions CONST => STRING */
-mxArray* mechanism_to_m(void* handler) ;
+mxArray* mechanism_to_m(void* handle) ;
 
 #endif
