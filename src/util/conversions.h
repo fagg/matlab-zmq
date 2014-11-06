@@ -15,6 +15,10 @@ mxArray* int_to_m(void* handle);
 mxArray* str_to_m(void* handle);
 mxArray* pointer_to_m(void* handle);
 
+void* uint64_from_m(const mxArray* param);
+void* int64_from_m(const mxArray* param);
+void* uint32_from_m(const mxArray* param);
+void* int_from_m(const mxArray* param);
 void* str_from_m(const mxArray* param);
 void* pointer_from_m(const mxArray* param);
 
