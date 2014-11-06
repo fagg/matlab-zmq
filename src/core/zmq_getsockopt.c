@@ -8,11 +8,11 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 {
     void* socket = NULL;
     char* option = NULL;
-    void* api_return = NULL;
-    const zmq_sockopt_desc_t* optdesc = NULL;
-    const zmq_sockopt_type_t* typedesc = NULL;
-    size_t api_return_len;
-    int rc, err;
+    void* coreAPIReturn = NULL;
+    size_t coreAPIReturnSz;
+    const zmq_sockopt_desc_t* optDesc = NULL;
+    const zmq_sockopt_type_t* typeDesc = NULL;
+    int rc;
 
     if (nrhs != 2) {
         mexErrMsgIdAndTxt("zmq:getsockopts:invalidArgs",
@@ -34,33 +34,34 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     option = (char*) str_from_m(prhs[1]);
     if (option == NULL) return;
 
-    optdesc = sockopt_find_by_name(option);
-    if (optdesc == NULL) return;
 
-    typedesc = sockopt_find_type(optdesc->type_id);
-    if (typedesc == NULL) return;
+    optDesc = find_sockopt_by_name(option);
+    if (optDesc == NULL) return;
+
+    typeDesc = find_sockopt_type_by_id(optDesc->typeId);
+    if (typeDesc == NULL) return;
 
     mxFree(option);
 
     socket = pointer_from_m(prhs[0]);
 
-    api_return_len = typedesc->maxlen;
-    api_return = (void*) mxMalloc(api_return_len);
+    coreAPIReturnSz = typeDesc->maxLen;
+    coreAPIReturn = (void*) mxMalloc(coreAPIReturnSz);
 
-    if (api_return == NULL) {
+    if (coreAPIReturn == NULL) {
         mexErrMsgIdAndTxt("mex:malloc",
                 "Error: Unsuccessful memory allocation.");
         return;
     }
 
-    rc = zmq_getsockopt(socket, optdesc->id, api_return, &api_return_len);
+    rc = zmq_getsockopt(socket, optDesc->id, coreAPIReturn, &coreAPIReturnSz);
 
     if (rc < 0) {
         socket_error();
-        mxFree(api_return);
+        mxFree(coreAPIReturn);
         return;
     }
 
-    plhs[0] = typedesc->to_m(api_return);
-    mxFree(api_return);
+    plhs[0] = typeDesc->to_m(coreAPIReturn);
+    mxFree(coreAPIReturn);
 }
