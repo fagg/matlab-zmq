@@ -19,7 +19,9 @@ const zmq_socket_type_t* find_socket_type_by_name(char* type);
 
 /* Extra conversions CONST => STRING */
 mxArray* socktype_to_m(void* handle);
+void* socktype_from_m(const mxArray* param);
 
+/* Common error handler */
 void socket_error();
 
 #endif

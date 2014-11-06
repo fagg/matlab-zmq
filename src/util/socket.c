@@ -101,6 +101,30 @@ mxArray* socktype_to_m(void* handle) {
     return ret;
 }
 
+void* socktype_from_m(const mxArray* param) {
+    int* output = NULL;
+    char* name = NULL;
+    const zmq_socket_type_t* sockType = NULL;
+
+    output = (int*) mxCalloc(1, sizeof(int));
+
+    if (output == NULL) {
+        mexErrMsgIdAndTxt("util:calloc", "Error: Unsuccessful memory allocation.");
+    }
+
+    name = (char*) str_from_m(param);
+    if (name == NULL) return NULL;
+
+    sockType = find_socket_type_by_name(name);
+    if (sockType != NULL) *output = sockType->id;
+
+    mxFree(name);
+
+    return (void*) output;
+}
+
+/* Common error handler */
+
 void socket_error() {
     int err;
 
