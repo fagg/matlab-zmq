@@ -14,11 +14,11 @@ typedef struct _stype_desc {
     const char* name;
 } zmq_socket_type_t;
 
-const zmq_socket_type_t* socket_type_find_by_id(int id);
-const zmq_socket_type_t* socket_type_find_by_name(char* type);
+const zmq_socket_type_t* find_socket_type_by_id(int id);
+const zmq_socket_type_t* find_socket_type_by_name(char* type);
 
 /* Extra conversions CONST => STRING */
-mxArray* socktype_to_m(void* handler);
+mxArray* socktype_to_m(void* handle);
 
 void socket_error();
 

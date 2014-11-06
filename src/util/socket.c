@@ -1,6 +1,7 @@
 #include "socket.h"
 #include <mex.h>
 #include <zmq.h>
+#include <errno.h>
 
 /*
   Lookupt table with metadata used to interpret socket types.
@@ -8,7 +9,7 @@
   The field `id` is the constant defined in `zmq.h`.
   The field `name` is the string representing this constant.
  */
-static const zmq_socket_type_t socket_type_lookup[] = {
+static const zmq_socket_type_t socketTypeLookup[] = {
     {ZMQ_PAIR   , "ZMQ_PAIR"  } ,
     {ZMQ_PUB    , "ZMQ_PUB"   } ,
     {ZMQ_SUB    , "ZMQ_SUB"   } ,
@@ -33,26 +34,26 @@ static const zmq_socket_type_t socket_type_lookup[] = {
   ## Return
   Pointer to a struct with metada (`zmq_socket_type_t`)
  */
-const zmq_socket_type_t* socket_type_find_by_name(char* type) {
+const zmq_socket_type_t* find_socket_type_by_name(char* type) {
     int i;
-    const zmq_socket_type_t* decriptor = NULL;
+    const zmq_socket_type_t* descriptor = NULL;
 
     /*
-      TODO: as `socket_type_lookup` table order can be chosen arbitrarily,
+      TODO: as `socketTypeLookup` table order can be chosen arbitrarily,
       we can use binary search to speed up this process.
      */
-    for (i = 0; socket_type_lookup[i].name != NULL; i++) {
-        if (!strcmp(type, socket_type_lookup[i].name)) {
-            decriptor = &(socket_type_lookup[i]);
+    for (i = 0; socketTypeLookup[i].name != NULL; i++) {
+        if (!strcmp(type, socketTypeLookup[i].name)) {
+            descriptor = &(socketTypeLookup[i]);
             break;
         }
     }
 
-    if (decriptor == NULL) {
+    if (descriptor == NULL) {
         mexErrMsgIdAndTxt("zmq:socket:invalidTypeName",
             "Error: socket type %s is invalid.", type);
     }
-    return decriptor;
+    return descriptor;
 }
 
 /*
@@ -64,38 +65,38 @@ const zmq_socket_type_t* socket_type_find_by_name(char* type) {
   ## Return
   Pointer to a struct with metada (`zmq_socket_type_t`)
  */
-const zmq_socket_type_t* socket_type_find_by_id(int id) {
+const zmq_socket_type_t* find_socket_type_by_id(int id) {
     int i;
-    const zmq_socket_type_t* decriptor = NULL;
+    const zmq_socket_type_t* descriptor = NULL;
 
     /*
-      TODO: as `socket_type_lookup` table order can be chosen arbitrarily,
+      TODO: as `socketTypeLookup` table order can be chosen arbitrarily,
       we can use binary search to speed up this process.
      */
-    for (i = 0; socket_type_lookup[i].name != NULL; i++) {
-        if (id == socket_type_lookup[i].id) {
-            decriptor = &(socket_type_lookup[i]);
+    for (i = 0; socketTypeLookup[i].name != NULL; i++) {
+        if (id == socketTypeLookup[i].id) {
+            descriptor = &(socketTypeLookup[i]);
             break;
         }
     }
 
-    if (decriptor == NULL) {
+    if (descriptor == NULL) {
         mexErrMsgIdAndTxt("zmq:socket:invalidTypeId",
             "Error: socket type %d is invalid.", id);
     }
-    return decriptor;
+    return descriptor;
 }
 
 
 /* Custom CONSTANT <=> STRING convertions */
 
-mxArray* socktype_to_m(void* handler) {
+mxArray* socktype_to_m(void* handle) {
     mxArray* ret;
-    const zmq_socket_type_t* socktype = NULL;
+    const zmq_socket_type_t* sockType = NULL;
 
-    socktype = socket_type_find_by_id(*((int*) handler));
+    sockType = find_socket_type_by_id(*((int*) handle));
 
-    if (socktype != NULL) ret = (mxArray*) str_to_m((void*) socktype->name);
+    if (sockType != NULL) ret = (mxArray*) str_to_m((void*) sockType->name);
 
     return ret;
 }
@@ -131,7 +132,7 @@ void socket_error() {
                     "\n(original message: %s)", zmq_strerror(err));
         break;
         default:
-            mexErrMsgIdAndTxt("zmq:getsockopts:unknownOops",
+            mexErrMsgIdAndTxt("zmq:unknownOops",
                     "Error: Something has gone very, very wrong. Unknown error."
                     "\n(original message: %s)", zmq_strerror(err));
     }
