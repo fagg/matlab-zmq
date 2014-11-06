@@ -63,15 +63,10 @@ function test_zmq_setsockopt
     option = common_options{n}{1};
     value = common_options{n}{2};
 
-    try
-      response = zmq_setsockopt(socket, option, value);
-    catch e
-      % Check if it is octave (`try...catch` not 100% > needs workaround)
-      if exist('OCTAVE_VERSION', 'builtin'); e = lasterror; end
-      assert(isempty(e.message), '%s should not raise this error: "%s".', option, e.message);
-    end
-    response = zmq_getsockopt(socket, option);
+    response = assert_does_not_throw(@zmq_setsockopt, socket, option, value);
+    assert(response == 0, 'status code should be 0, %d given.', response);
 
+    response = zmq_getsockopt(socket, option);
     if ~ischar(value)
       condition = response == value;
       % display
@@ -88,7 +83,7 @@ function test_zmq_setsockopt
   end
 
   % close session
+  zmq_close(socket);
   zmq_ctx_shutdown(ctx);
-  % zmq_ctx_term(ctx); % Despite of ZMQ_LINGER being setted to 2, it still blocks...
-                       % My suspect: it will only work if socket is bounded
+  zmq_ctx_term(ctx);
 end

@@ -43,7 +43,7 @@ function test_zmq_getsockopt
     option = defaultOptions{n}{1};
     value = defaultOptions{n}{2};
 
-    response = zmq_getsockopt(socket, option);
+    response = assert_does_not_throw(@zmq_getsockopt, socket, option);
 
     if ~ischar(value)
       condition = response == value;
@@ -61,8 +61,7 @@ function test_zmq_getsockopt
   end
 
   % close session
+  zmq_close(socket);
   zmq_ctx_shutdown(ctx);
-  %zmq_ctx_term(ctx); % once ZMQ_LINGER is set to -1 by default, `zmq_ctx_term`
-                      % will block until socket is closed, but this operation is
-                      % not implemented yet.
+  zmq_ctx_term(ctx);
 end
