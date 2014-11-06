@@ -2,13 +2,13 @@
 #include <mex.h>
 #include <zmq.h>
 
-mxArray* uint64_matrix_to_m(void* handler, size_t m, size_t n) {
+mxArray* uint64_matrix_to_m(void* handle, size_t m, size_t n) {
     mxArray* ret;
     uint64_t* input;
     uint64_t* output;
     int i, j;
 
-    input = (uint64_t*) handler;
+    input = (uint64_t*) handle;
 
     ret = mxCreateNumericMatrix(m, n, mxUINT64_CLASS, mxREAL);
     output = (uint64_t*) mxGetData(ret);
@@ -22,13 +22,13 @@ mxArray* uint64_matrix_to_m(void* handler, size_t m, size_t n) {
     return ret;
 }
 
-mxArray* int64_matrix_to_m(void* handler, size_t m, size_t n) {
+mxArray* int64_matrix_to_m(void* handle, size_t m, size_t n) {
     mxArray* ret;
     int64_t* input;
     int64_t* output;
     int i, j;
 
-    input = (int64_t*) handler;
+    input = (int64_t*) handle;
 
     ret = mxCreateNumericMatrix(m, n, mxINT64_CLASS, mxREAL);
     output = (int64_t*) mxGetData(ret);
@@ -42,13 +42,13 @@ mxArray* int64_matrix_to_m(void* handler, size_t m, size_t n) {
     return ret;
 }
 
-mxArray* uint32_matrix_to_m(void* handler, size_t m, size_t n) {
+mxArray* uint32_matrix_to_m(void* handle, size_t m, size_t n) {
     mxArray* ret;
     uint32_t* input;
     uint32_t* output;
     int i, j;
 
-    input = (uint32_t*) handler;
+    input = (uint32_t*) handle;
 
     ret = mxCreateNumericMatrix(m, n, mxUINT32_CLASS, mxREAL);
     output = (uint32_t*) mxGetData(ret);
@@ -63,13 +63,13 @@ mxArray* uint32_matrix_to_m(void* handler, size_t m, size_t n) {
 }
 
 /* TODO: discover the exact size of platform default int */
-mxArray* int_matrix_to_m(void* handler, size_t m, size_t n) {
+mxArray* int_matrix_to_m(void* handle, size_t m, size_t n) {
     mxArray* ret;
     int* input;
     int32_t* output;
     int i, j;
 
-    input = (int*) handler;
+    input = (int*) handle;
 
     ret = mxCreateNumericMatrix(m, n, mxINT32_CLASS, mxREAL);
     output = (int32_t*) mxGetData(ret);
@@ -83,27 +83,27 @@ mxArray* int_matrix_to_m(void* handler, size_t m, size_t n) {
     return ret;
 }
 
-mxArray* uint64_to_m(void* handler) {
-    return uint64_matrix_to_m(handler, 1, 1);
+mxArray* uint64_to_m(void* handle) {
+    return uint64_matrix_to_m(handle, 1, 1);
 }
 
-mxArray* int64_to_m(void* handler) {
-    return int64_matrix_to_m(handler, 1, 1);
+mxArray* int64_to_m(void* handle) {
+    return int64_matrix_to_m(handle, 1, 1);
 }
 
-mxArray* uint32_to_m(void* handler) {
-    return uint32_matrix_to_m(handler, 1, 1);
+mxArray* uint32_to_m(void* handle) {
+    return uint32_matrix_to_m(handle, 1, 1);
 }
 
-mxArray* int_to_m(void* handler) {
-    return int_matrix_to_m(handler, 1, 1);
+mxArray* int_to_m(void* handle) {
+    return int_matrix_to_m(handle, 1, 1);
 }
 
-mxArray* str_to_m(void* handler) {
-    return mxCreateString((char*) handler);
+mxArray* str_to_m(void* handle) {
+    return mxCreateString((char*) handle);
 }
 
-mxArray* pointer_to_m(void* handler) {
+mxArray* pointer_to_m(void* handle) {
     mxArray* ret;
     void** output;
 
@@ -114,7 +114,7 @@ mxArray* pointer_to_m(void* handler) {
     }
 
     output = (void**) mxGetData(ret);
-    output[0] = handler;
+    output[0] = handle;
 
     return ret;
 }
