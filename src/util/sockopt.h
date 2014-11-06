@@ -46,6 +46,7 @@ typedef struct _sopt_type_desc {
     int id;
     size_t maxLen;
     mxArray* (*to_m)(void* handle);
+    void* (*from_m)(const mxArray* param);
 } zmq_sockopt_type_t;
 
 /*
@@ -59,11 +60,14 @@ typedef struct _sopt_mechanism_desc {
     const char* name;
 } zmq_sockopt_mechanism_t;
 
+/* Extra conversions CONST => STRING */
 const zmq_sockopt_desc_t* find_sockopt_by_name(char* option);
 const zmq_sockopt_type_t* find_sockopt_type_by_id(int typeId);
-const zmq_sockopt_mechanism_t* find_sockopt_mechanism_by_id(int mechanismId);
 
-/* Extra conversions CONST => STRING */
+const zmq_sockopt_mechanism_t* find_sockopt_mechanism_by_id(int mechanismId);
+const zmq_sockopt_mechanism_t* find_sockopt_mechanism_by_name(char* name);
+
 mxArray* mechanism_to_m(void* handle) ;
+void* mechanism_from_m(const mxArray* param);
 
 #endif
