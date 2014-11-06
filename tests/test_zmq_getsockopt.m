@@ -4,7 +4,7 @@ function test_zmq_getsockopt
   socket = zmq_socket(ctx, 'ZMQ_REP');
 
   % Table with the default values for options
-  default_options = { ...
+  defaultOptions = { ...
     {'ZMQ_TYPE'                , 'ZMQ_REP' } , ...
     {'ZMQ_RCVMORE'             , 0         } , ...
     {'ZMQ_SNDHWM'              , 1000      } , ...
@@ -39,9 +39,9 @@ function test_zmq_getsockopt
   %
   % Once the socket is fresh and unused, all the options should remain with the
   % default values.
-  for n = 1:(length(default_options)-1)
-    option = default_options{n}{1};
-    value = default_options{n}{2};
+  for n = 1:(length(defaultOptions)-1)
+    option = defaultOptions{n}{1};
+    value = defaultOptions{n}{2};
 
     response = zmq_getsockopt(socket, option);
 
