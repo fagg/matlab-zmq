@@ -1,6 +1,7 @@
 #include <util/socket.h>
 #include <util/sockopt.h>
 #include <util/conversions.h>
+#include <util/errors.h>
 #include <mex.h>
 #include <zmq.h>
 
@@ -57,7 +58,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     rc = zmq_getsockopt(socket, optDesc->id, coreAPIReturn, &coreAPIReturnSz);
 
     if (rc < 0) {
-        socket_error();
+        handle_error();
         mxFree(coreAPIReturn);
         return;
     }
