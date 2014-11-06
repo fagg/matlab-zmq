@@ -23,7 +23,9 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
         mexErrMsgIdAndTxt("zmq:socket:sockTypeNotRowVec",
                 "Error: socket_type is not a row vector.");
     }
+
     coreAPIReturn = core_socket(prhs);
+
     if (sizeof(void *) == 4) {
         plhs[0] = mxCreateNumericMatrix(1,1,mxUINT32_CLASS, mxREAL);
     } else {
@@ -54,6 +56,7 @@ void *core_socket(const mxArray *params[])
     char *sockType;
     void **contextPtr;
     void *coreAPIReturn;
+    int err;
 
     sockType = get_socket_type(params[1]);
     contextPtr = (void **) mxGetData(params[0]);
@@ -90,22 +93,35 @@ void *core_socket(const mxArray *params[])
 
     coreAPIReturn = zmq_socket(*contextPtr, sockTypeVal);
     if (coreAPIReturn == NULL) {
+        err = errno;
+        /* Windows users can have problems with errno, see http://api.zeromq.org/4-0:zmq-errno */
+        if (err == 0) err = zmq_errno();
+
         switch (errno) {
             case EINVAL:
                 mexErrMsgIdAndTxt("zmq:socket:unknownSocketTypeCore",
-                        "Error: Unknown socket type (core).");
+                        "Error: Unknown socket type (core)."
+                        "\n(original message: %s)", zmq_strerror(err));
                 break;
             case EFAULT:
                 mexErrMsgIdAndTxt("zmq:socket:invalidContext",
-                        "Error: Invalid ZMQ context.");
+                        "Error: Invalid ZMQ context."
+                        "\n(original message: %s)", zmq_strerror(err));
                 break;
             case EMFILE:
                 mexErrMsgIdAndTxt("zmq:socket:maxSocketsReached",
-                        "Error: Max sockets reached on context.");
+                        "Error: Max sockets reached on context."
+                        "\n(original message: %s)", zmq_strerror(err));
                 break;
             case ETERM:
                 mexErrMsgIdAndTxt("zmq:socket:contextTerminated",
-                        "Error: ZMQ context was terminated.");
+                        "Error: ZMQ context was terminated."
+                        "\n(original message: %s)", zmq_strerror(err));
+                break;
+            default:
+                mexErrMsgIdAndTxt("zmq:socket:unknownOops",
+                        "Error: Something has gone very, very wrong. Unknown error."
+                        "\n(original message: %s)", zmq_strerror(err));
         }
     }
     return coreAPIReturn;
