@@ -102,6 +102,19 @@ mxArray* uint8_array_to_m(void* handle, size_t n) {
     return ret;
 }
 
+
+mxArray* size_t_to_m(void* handle) {
+    mxArray* ret;
+    uint64_t* output;
+
+    ret = mxCreateNumericMatrix(1, 1, mxUINT64_CLASS, mxREAL);
+
+    output = (uint64_t*) mxGetData(ret);
+    output[0] = (uint64_t) *((size_t*) handle);
+
+    return ret;
+}
+
 mxArray* uint64_to_m(void* handle) {
     return uint64_matrix_to_m(handle, 1, 1);
 }
@@ -159,6 +172,19 @@ void* uint8_array_from_m(const mxArray* param, size_t n) {
     }
 
     return memcpy(output, input, n*sizeof(uint8_t));
+}
+
+void* size_t_from_m(const mxArray* param) {
+    size_t* output = NULL;
+    output = (size_t*) mxCalloc(1, sizeof(size_t));
+
+    if (output == NULL) {
+        mexErrMsgIdAndTxt("util:calloc", "Error: Unsuccessful memory allocation.");
+    }
+
+    *output = (size_t) mxGetScalar(param);
+
+    return (void*) output;
 }
 
 void* uint64_from_m(const mxArray* param) {
