@@ -1,6 +1,8 @@
 #include "conversions.h"
 #include <mex.h>
 #include <zmq.h>
+#include <string.h>
+#include <stdlib.h>
 
 /* -- from C to MATLAB ------------------------------------------------------ */
 
@@ -85,6 +87,21 @@ mxArray* int_matrix_to_m(void* handle, size_t m, size_t n) {
     return ret;
 }
 
+mxArray* uint8_array_to_m(void* handle, size_t n) {
+    mxArray* ret;
+    uint8_t* input;
+    uint8_t* output;
+
+    input = (uint8_t*) handle;
+
+    ret = mxCreateNumericMatrix(1, n, mxUINT8_CLASS, mxREAL);
+    output = (uint8_t*) mxGetData(ret);
+
+    memcpy(output, input, n*sizeof(uint8_t));
+
+    return ret;
+}
+
 mxArray* uint64_to_m(void* handle) {
     return uint64_matrix_to_m(handle, 1, 1);
 }
@@ -123,6 +140,27 @@ mxArray* pointer_to_m(void* handle) {
 
 
 /* -- from MATLAB to C ------------------------------------------------------ */
+
+/*
+  We can discover matrix shape from handle, but enforcing n as argument
+  ensures that caller would know it also...
+
+  (Unfortunally there is no simple way to have 2 returns: pointer and n)
+ */
+void* uint8_array_from_m(const mxArray* param, size_t n) {
+    uint8_t* input = NULL;
+    uint8_t* output = NULL;
+
+    input = (uint8_t*) mxGetData(param);
+    output = (uint8_t*) mxCalloc(n, sizeof(uint8_t));
+
+    if (output == NULL) {
+        mexErrMsgIdAndTxt("util:calloc", "Error: Unsuccessful memory allocation.");
+    }
+
+    return memcpy(output, input, n*sizeof(uint8_t));
+}
+
 void* uint64_from_m(const mxArray* param) {
     uint64_t* output = NULL;
     output = (uint64_t*) mxCalloc(1, sizeof(uint64_t));
