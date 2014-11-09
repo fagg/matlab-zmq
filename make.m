@@ -1,43 +1,230 @@
-% make.m
-%
-% Builds core mex API.
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+function success = make(varargin)
+  % make.m
+  %
+  % Tools for building matlab API for ZMQ.
+  %
+  % ## USAGE:
+  %
+  % ```matlab
+  % >> make % This will build all the core API
+  % >> make zmq_version.c zmq_ctx_new.c % This will build only the listed files
+  % >> make clean % Remove files produced by compilation process
+  % ```
+  %
+  % ## NOTICE:
+  %
+  % Before runnig this, make sure to install ZMQ and edit 'config.m' file.
+  %
+  % Instructions for installing ZMQ: http://zeromq.org/intro:get-the-software.
+  %
+  % The files `config_win.m` and `config_unix.m` are examples of how to edit
+  % `config.m` for different operating systems.
+  %
+  % The file `config.m` itself shows how to build `matlab-zmq` using a Homebrew
+  % instalation of ZMQ 4.0.4 for OS-X.
 
-%% ZMQ CONFIGURATION:
-
-if ispc
-% == WINDOWS ==
-
-  % see http://zeromq.org/distro:microsoft-windows for a description of the
-  % binaries and SO version compatibility
-
-  % The filename for the compiled lib (without the extension)
-  ZMQ_COMPILED_LIB = 'libzmq-v120-mt-4_0_4';
-
-  % Where is the compiled lib placed?
-  ZMQ_LIB_PATH = 'C:\Program Files\ZeroMQ 4.0.4\lib\';
-
-  % Where can we find the headers?
-  ZMQ_INCLUDE_PATH = 'C:\Program Files\ZeroMQ 4.0.4\include\';
-else
-% == POSIX ==
-
-  % The filename for the compiled lib (without the extension and the 'lib'
-  % prefix)
-  ZMQ_COMPILED_LIB = 'zmq';
-
-  % Where is the compiled lib placed?
-  ZMQ_LIB_PATH = '/usr/local/Cellar/zeromq/4.0.4/lib/'; % maybe /usr/local/lib/ ?
-
-  % Where can we find the headers?
-  ZMQ_INCLUDE_PATH = '/usr/local/Cellar/zeromq/4.0.4/include/'; % maybe /usr/local/include/ ?
+  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  %% Rules
+  if nargin > 0
+    switch lower(varargin{1})
+      case 'clean'
+        success = clean(varargin{2:end});
+      case 'test'
+        success = run_tests(varargin{2:end});
+      case {'build', 'compile'}
+        success = build(varargin{2:end});
+      otherwise
+        success = build(varargin{:});
+    end
+  else
+    success = build;
+  end
 end
 
+%% Make rules
 
-%% SCRIPT VARS
+function success = clean(varargin)
+  % Remove the files generated during compilation process.
+  %
+  % Arguments:
+  %  - [...]: Variable list of paths to be deleted, relative to this file.
+  %           No recursive glob patterns can be used.
+  %
+  % If no argument is provided, all 'lib/*.mex*', '*.o', '*.asv', '*.m~' files
+  % will be remvoed.
+  %
+  % NOTICE: Without arguments, it will purge the created bindings.
+  success = false;
 
-% --> Windows whitespace normalization :(
-if ispc
+  [make_path, ~, ~, ~] = get_paths;
+  if nargin > 0
+    rubish = varargin;
+  else
+    rubish = {'lib/*.mex*', '*.o', '*.asv', '*.m~'};
+  end
+
+  for n = 1:length(rubish)
+    pattern = fullfile(make_path, rubish{n});
+    try
+      if ~isempty(dir(pattern)); delete(pattern); end
+    end
+  end
+
+  success = true;
+end
+
+function success = run_tests(varargin)
+  % Run tests for the library
+  %
+  % ## Arguments
+  %   - [...]: variable list of tests.
+  %
+  % If no argument is provided, all the files `test*.m` under `tests` dir will
+  % run.
+  %
+  % Notice that the files will be considered relative to `tests` directory.
+  [~, lib_path ~, test_path] = get_paths;
+
+  % save current path
+  original_path = path;
+  addpath(test_path);
+  addpath(lib_path);
+
+  success = runner(varargin{:});
+
+  % restore path
+  path(original_path);
+end
+
+function success = build(varargin)
+  % Build core ZMQ bindings
+  %
+  % ## Arguments
+  %   - [...]: variable list of files to be compiled.
+  %
+  % If no argument is provided, the list will be loaded from `compile_list.m`
+  % file.
+  %
+  % Notice that the files will be considered relative to `src/core` directory.
+  %
+  % Instead of a plain string, a cell array of strings can be also used as
+  % argument. In this case, the first string is the _main_ file
+  % (relative to `src/core` directory), while the others are _dependencies_
+  % (relative to `src`).
+
+  [make_path, lib_path, src_path, ~] = get_paths;
+
+  %% ZMQ CONFIGURATION:
+  % Try manual config first
+  config;
+
+  if ~testzmq(ZMQ_LIB_PATH) || ~testzmq(ZMQ_INCLUDE_PATH)
+    % Default fallback
+    if ispc
+      % == WINDOWS ==
+      config_win;
+    else
+      % == POSIX ==
+      config_unix;
+    end
+
+    if ~testzmq(ZMQ_LIB_PATH) || ~testzmq(ZMQ_INCLUDE_PATH)
+      error('make:matlab-zmq:badConfig', ...
+        'Could not find ZMQ files, please edit ''config.m'' and try again.');
+    end
+  end
+
+  %% SCRIPT VARS
+
+  % --> Windows whitespace normalization :(
+  orig_zmq_include_path = ZMQ_INCLUDE_PATH;
+  orig_zmq_lib_path = ZMQ_LIB_PATH;
+  ZMQ_INCLUDE_PATH = reducepath(ZMQ_INCLUDE_PATH);
+  ZMQ_LIB_PATH = reducepath(ZMQ_LIB_PATH);
+  % <--
+
+  % --> '-l' option: libname normalization
+  orig_zmq_lib = ZMQ_COMPILED_LIB;
+  ZMQ_COMPILED_LIB = regexprep(orig_zmq_lib, '(^lib)|(\.\w+$)', '');
+  % <--
+
+  zmq_compile_flags = { ...
+    ['-I' dquote(src_path)], ...
+    ['-I' dquote(ZMQ_INCLUDE_PATH)], ...
+    ['-L' dquote(ZMQ_LIB_PATH)], ...
+    ['-l' dquote(ZMQ_COMPILED_LIB)] ...
+  };
+
+  if nargin > 0
+    COMPILE_LIST = varargin;
+  else
+    compile_list;
+  end
+
+  lib_path = reducepath(lib_path); % Windows :(
+
+  build_function = @(file) compile(zmq_compile_flags, file, lib_path);
+  cellfun(build_function, COMPILE_LIST);
+
+  clean('*.o');
+
+  files = ls(fullfile(lib_path, '*.mex*'));
+  if size(files, 1) == length(COMPILE_LIST)
+    success = true;
+    fprintf('\nSuccesful build for:\n');
+  else
+    success = false;
+    fprintf('\nErrors during build for:\n');
+  end
+  fprintf(...
+    '\tZMQ_INCLUDE_PATH = %s\n\tZMQ_LIB_PATH = %s\n\tZMQ_COMPILED_LIB = %s\n\n', ...
+    orig_zmq_include_path, orig_zmq_lib_path, orig_zmq_lib);
+end
+
+%% Auxiliar functions
+
+function compile(flags, file, outputdir)
+  % Compile files
+  [~, ~, src_path, ~] = get_paths;
+
+  deps = {};
+
+  if iscell(file)
+    if length(file) > 1
+      deps = cellfun(@(dep) dquote(fullfile(src_path, dep)), file(2:end), 'UniformOutput', false);
+    end
+    file = file{1};
+  end
+
+  [~, name, ext] = fileparts(file);
+  outputfile = fullfile(outputdir, name);
+  file = dquote([fullfile(src_path, 'core', name), ext]);
+
+  fprintf('compile %s\n', file);
+  cellfun(@(dep) fprintf('\t- %s\n', dep), deps);
+
+  if isoctave
+    mex(flags{:}, deps{:}, file, '-o', dquote(outputfile));
+  else
+    % TODO: scape properly the `outputfile` to avoid whitespace issues.
+    % Inexplicably just using quotes (`sprintf('"%s"', outputfile)` or
+    % `['"' outputfile '"']` ) does not work on Windows, even when there are not
+    % whitespaces.
+    mex('-largeArrayDims', '-O', flags{:}, deps{:}, file, '-output', outputfile);
+  end
+end
+
+function result = isoctave
+  % Check if it is octave
+  result = exist('OCTAVE_VERSION', 'builtin');
+end
+
+function quoted = dquote(file)
+  % Double quote strings
+  quoted = ['"' file '"'];
+end
+
+function red_path = reducepath(orig_path)
   % Unfortunatelly windows has severe issues with spaces in the path
   % strings, even when we scape them with quotes.
   %
@@ -55,44 +242,37 @@ if ispc
   % TODO: consider the much nicer second alternative. Is it reliable in a
   % wide range of environments (diferent versions of Windows, even the
   % future ones)?
-  reduce_path = @(orig_path) system(['for %A in ("', orig_path ,'") do @echo %~sA']);
-  [status, ZMQ_INCLUDE_PATH] = reduce_path(ZMQ_INCLUDE_PATH);
-  if status; error('mex:compile', 'Unable to recognize path'); end
-  ZMQ_INCLUDE_PATH = strtrim(ZMQ_INCLUDE_PATH);
-  [status, ZMQ_LIB_PATH] = reduce_path(ZMQ_LIB_PATH);
-  if status; error('mex:compile', 'Unable to recognize path'); end
-  ZMQ_LIB_PATH = strtrim(ZMQ_LIB_PATH);
-end
-% <--
 
-ZMQ_COMPILE_FLAGS = sprintf('-I"%s" -L"%s" -l"%s"', ZMQ_INCLUDE_PATH, ZMQ_LIB_PATH, ZMQ_COMPILED_LIB);
-
-[MAKE_DIR, ~, ~] = fileparts(mfilename('fullpath')); % Get the directory of this file (absolute path)
-LIB_PATH = fullfile(MAKE_DIR, 'lib');
-SRC_PATH = fullfile(MAKE_DIR, 'src', 'core');
-
-%% CORE API FILE LIST
-CORE_FILE_LIST = { ...
-                fullfile(SRC_PATH, 'zmq_version.c'), ...
-                fullfile(SRC_PATH, 'zmq_ctx_new.c'), ...
-                fullfile(SRC_PATH, 'zmq_ctx_term.c'), ...
-                fullfile(SRC_PATH, 'zmq_ctx_shutdown.c'), ...
-                fullfile(SRC_PATH, 'zmq_ctx_get.c'), ...
-                fullfile(SRC_PATH, 'zmq_ctx_set.c'), ...
-                fullfile(SRC_PATH, 'zmq_socket.c') ...
-                };
-
-
-%% BUILD
-% TODO: scape properly the LIB_PATH to avoid whitespace issues.
-% Inexplicably just using quotes (`sprintf(' "%s" -outdir "%s"', ...`) does
-% not work on Windows, even when there are not whitespaces.
-
-if ispc
-  [status, LIB_PATH] = reduce_path(LIB_PATH);
-  if status; error('mex:compile', 'Unable to recognize path'); end
-  LIB_PATH = strtrim(LIB_PATH);
+  if ispc
+    [status, red_path] = system(['for %A in ("', orig_path ,'") do @echo %~sA']);
+    if status; error('system:reducepath', 'Unable to recognize path'); end
+    red_path = strtrim(red_path);
+  else
+    red_path = orig_path;
+  end
 end
 
-BUILD_FUNCTION = @(file) eval(['mex -largeArrayDims -O ', ZMQ_COMPILE_FLAGS, sprintf(' "%s" -outdir %s', char(file), LIB_PATH)]);
-cellfun(BUILD_FUNCTION, CORE_FILE_LIST);
+function response = testzmq(folder)
+  % Test if there are any zmq files inside folder
+
+  try
+    files = dir(fullfile(folder, '*zmq*'));
+  catch
+    files = [];
+  end
+
+  if ~isempty(files)
+    response = 1;
+  else
+    response = 0;
+  end
+end
+
+function [make_path, lib_path, src_path, test_path] = get_paths
+  % Return the paths used for this library
+
+  [make_path, ~, ~] = fileparts(mfilename('fullpath'));
+  lib_path = fullfile(make_path, 'lib');
+  src_path = fullfile(make_path, 'src');
+  test_path = fullfile(make_path, 'tests');
+end
