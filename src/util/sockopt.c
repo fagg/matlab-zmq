@@ -92,19 +92,19 @@ static const zmq_sockopt_desc_t sockOptLookup[] = {
   value to MATLAB.
  */
 static const zmq_sockopt_type_t sockOptTypeLookup[] = {
-    {SOPT_UINT64   , sizeof(uint64_t) , uint64_to_m   },
-    {SOPT_INT64    , sizeof(int64_t)  , int64_to_m    },
-    {SOPT_UINT32   , sizeof(uint32_t) , uint32_to_m   },
-    {SOPT_INT      , sizeof(int)      , int_to_m      },
-    {SOPT_STRING   , 255*sizeof(char) , str_to_m      },
-    {SOPT_KEY      , 41*sizeof(char)  , str_to_m      }, /* Z85 key (40) + terminator (1) */
-    {SOPT_SOCKTYPE , sizeof(int)      , socktype_to_m },
-    {SOPT_MECHANISM, sizeof(int)      , mechanism_to_m},
+    {SOPT_UINT64    , sizeof(uint64_t) , uint64_to_m    , uint64_from_m   } ,
+    {SOPT_INT64     , sizeof(int64_t)  , int64_to_m     , int64_from_m    } ,
+    {SOPT_UINT32    , sizeof(uint32_t) , uint32_to_m    , uint32_from_m   } ,
+    {SOPT_INT       , sizeof(int)      , int_to_m       , int_from_m      } ,
+    {SOPT_STRING    , 255*sizeof(char) , str_to_m       , str_from_m      } ,
+    {SOPT_KEY       , 41*sizeof(char)  , str_to_m       , str_from_m      } , /* Z85 key (40) + terminator (1) */
+    {SOPT_SOCKTYPE  , sizeof(int)      , socktype_to_m  , socktype_from_m } ,
+    {SOPT_MECHANISM , sizeof(int)      , mechanism_to_m , mechanism_from_m} ,
 #if defined _WIN32
-    {SOPT_SOCKET   , sizeof(SOCKET)   , pointer_to_m  },
+    {SOPT_SOCKET    , sizeof(SOCKET)   , pointer_to_m   , pointer_from_m  } ,
 #endif
-    {SOPT_INVALID  , 0                , NULL          }
-};
+    {SOPT_INVALID   , 0                , NULL           , NULL            }
+} ;
 
 /*
   Lookupt table with metadata fields, used to interpret security mechanism.
@@ -212,6 +212,33 @@ const zmq_sockopt_mechanism_t* find_sockopt_mechanism_by_id(int mechanismId) {
     return descriptor;
 }
 
+/*
+  Find the metadata related to the socket security mechanism.
+
+  ## Arguments
+    - name: pointer to string, containing the name for the option, e.g. "ZMQ_NULL"
+
+  ## Return
+  Pointer to a struct with metada (`zmq_sockopt_type_t`)
+ */
+const zmq_sockopt_mechanism_t* find_sockopt_mechanism_by_name(char* name) {
+    int i;
+    const zmq_sockopt_mechanism_t* descriptor = NULL;
+
+    for (i = 0; sockOptMechanismLookup[i].name != NULL; i++) {
+        if (!strcmp(name, sockOptMechanismLookup[i].name)) {
+            descriptor = &(sockOptMechanismLookup[i]);
+            break;
+        }
+    }
+    if (descriptor == NULL) {
+        mexErrMsgIdAndTxt("zmq:sockopt:invalidOptionMechanism",
+            "Error: socket_option mechanism %s is invalid.", name);
+    }
+    return descriptor;
+}
+
+
 /* Custom CONSTANT <=> STRING convertions */
 
 mxArray* mechanism_to_m(void* handle) {
@@ -223,3 +250,26 @@ mxArray* mechanism_to_m(void* handle) {
 
     return ret;
 }
+
+void* mechanism_from_m(const mxArray* param) {
+    int* output = NULL;
+    char* name = NULL;
+    const zmq_sockopt_mechanism_t* mechanism = NULL;
+
+    output = (int*) mxCalloc(1, sizeof(int));
+
+    if (output == NULL) {
+        mexErrMsgIdAndTxt("util:calloc", "Error: Unsuccessful memory allocation.");
+    }
+
+    name = (char*) str_from_m(param);
+    if (name == NULL) return NULL;
+
+    mechanism = find_sockopt_mechanism_by_name(name);
+    if (mechanism != NULL) *output = mechanism->id;
+
+    mxFree(name);
+
+    return (void*) output;
+}
+

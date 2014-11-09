@@ -14,6 +14,7 @@ function success = runner(varargin)
   % save current path
   original_path = path;
   addpath(test_path);
+  addpath(fullfile(test_path, 'support'));
 
   failures = {};
   nfailures = 0;
@@ -54,18 +55,34 @@ function success = runner(varargin)
   toc;
   fprintf('\n\n');
 
+  % restore path
+  path(original_path);
+
   if nfailures > 0
     success = 0;
     % Throw all failures as one
-    reportgen  = @(f) sprintf('%s (line %d):\n\t%s\n', f.stack(1).name, f.stack(1).line, f.message);
-    error('Tests: %d passed, %d failed.\n\n%s\n', nsuccess, nfailures, strjoin(cellfun(reportgen, failures, 'UniformOutput', false), '\n'));
+    error('Tests: %d passed, %d failed.\n\n%s\n', nsuccess, nfailures, ...
+      strjoin(cellfun(@reportgen, failures, 'UniformOutput', false), '\n'));
     % An error will ensure the exit code different from 0 in case of any not-well-succeeded test.
     % This is useful for continuous-integration services.
   else
     success = 1;
     fprintf('All tests passed.\n');
   end
+end
 
-  % restore path
-  path(original_path);
+function output = reportgen(err)
+  stack = find_test(err.stack);
+  output = sprintf('%s (line %d):\n\t%s\n', stack.name, stack.line, err.message);
+end
+
+function output = find_test(stack)
+  n = 1;
+  l = length(stack);
+
+  while isempty(regexp(stack(n).name, '^test', 'once')) && n < l
+    n = n + 1;
+  end
+
+  output = stack(n);
 end

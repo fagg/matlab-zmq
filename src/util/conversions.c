@@ -2,6 +2,8 @@
 #include <mex.h>
 #include <zmq.h>
 
+/* -- from C to MATLAB ------------------------------------------------------ */
+
 mxArray* uint64_matrix_to_m(void* handle, size_t m, size_t n) {
     mxArray* ret;
     uint64_t* input;
@@ -119,6 +121,60 @@ mxArray* pointer_to_m(void* handle) {
     return ret;
 }
 
+
+/* -- from MATLAB to C ------------------------------------------------------ */
+void* uint64_from_m(const mxArray* param) {
+    uint64_t* output = NULL;
+    output = (uint64_t*) mxCalloc(1, sizeof(uint64_t));
+
+    if (output == NULL) {
+        mexErrMsgIdAndTxt("util:calloc", "Error: Unsuccessful memory allocation.");
+    }
+
+    *output = (uint64_t) mxGetScalar(param);
+
+    return (void*) output;
+}
+
+void* int64_from_m(const mxArray* param) {
+    int64_t* output = NULL;
+    output = (int64_t*) mxCalloc(1, sizeof(int64_t));
+
+    if (output == NULL) {
+        mexErrMsgIdAndTxt("util:calloc", "Error: Unsuccessful memory allocation.");
+    }
+
+    *output = (int64_t) mxGetScalar(param);
+
+    return (void*) output;
+}
+
+void* uint32_from_m(const mxArray* param) {
+    uint32_t* output = NULL;
+    output = (uint32_t*) mxCalloc(1, sizeof(uint32_t));
+
+    if (output == NULL) {
+        mexErrMsgIdAndTxt("util:calloc", "Error: Unsuccessful memory allocation.");
+    }
+
+    *output = (uint32_t) mxGetScalar(param);
+
+    return (void*) output;
+}
+
+void* int_from_m(const mxArray* param) {
+    int* output = NULL;
+    output = (int*) mxCalloc(1, sizeof(int));
+
+    if (output == NULL) {
+        mexErrMsgIdAndTxt("util:calloc", "Error: Unsuccessful memory allocation.");
+    }
+
+    *output = (int) mxGetScalar(param);
+
+    return (void*) output;
+}
+
 void* str_from_m(const mxArray* param) {
     char* str = NULL;
     size_t len;
@@ -133,7 +189,7 @@ void* str_from_m(const mxArray* param) {
     }
 
     if (mxGetString(param, str, len) != 0) {
-        mexErrMsgIdAndTxt("util:mex2str",
+        mexErrMsgIdAndTxt("util:str_from_m",
                 "Error: Couldn't get parameter as string.");
     }
 
@@ -146,6 +202,10 @@ void* pointer_from_m(const mxArray* param) {
 
     input = (void**) mxGetData(param);
     output = (void*) input[0];
+
+    if (output == NULL) {
+        mexErrMsgIdAndTxt("util:pointer_from_m", "Error: Invalid pointer.");
+    }
 
     return output;
 }
