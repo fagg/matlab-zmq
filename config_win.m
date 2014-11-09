@@ -4,8 +4,8 @@
 % binary for your SO version.
 ZMQ_COMPILED_LIB = 'libzmq-v120-mt-4_0_4.lib';
 
-% Where is the compiled lib placed?
+% ZMQ library path
 ZMQ_LIB_PATH = 'C:\Program Files\ZeroMQ 4.0.4\lib\';
 
-% Where can we find the headers?
+% ZMQ headers path
 ZMQ_INCLUDE_PATH = 'C:\Program Files\ZeroMQ 4.0.4\include\';

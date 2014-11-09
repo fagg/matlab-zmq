@@ -15,6 +15,7 @@ function success = runner(varargin)
   original_path = path;
   addpath(test_path);
   addpath(fullfile(test_path, 'support'));
+  
 
   failures = {};
   nfailures = 0;
@@ -34,7 +35,7 @@ function success = runner(varargin)
   fprintf('Running tests:\n\n');
   tic;
   for n = 1:length(tests)
-    % A not-well-succeeded test **SHOULD** throw an exception
+    % Failed tests should throw an exception
     try
       [~, funcname, ~] = fileparts(tests{n});
       func = str2func(funcname);

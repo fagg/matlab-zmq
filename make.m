@@ -56,17 +56,19 @@ function success = clean(varargin)
   % NOTICE: Without arguments, it will purge the created bindings.
   success = false;
 
-  [make_path, ~, ~, ~] = get_paths;
+  [make_path, ~, ~, ~] = get_paths();
   if nargin > 0
-    rubish = varargin;
+    rubbish = varargin;
   else
-    rubish = {'lib/*.mex*', '*.o', '*.asv', '*.m~'};
+    rubbish = {'lib/*.mex*', '*.o', '*.asv', '*.m~'};
   end
 
-  for n = 1:length(rubish)
-    pattern = fullfile(make_path, rubish{n});
+  for n = 1:length(rubbish)
+    pattern = fullfile(make_path, rubbish{n});
     try
-      if ~isempty(dir(pattern)); delete(pattern); end
+      if ~isempty(dir(pattern))
+        delete(pattern); 
+      end
     end
   end
 
@@ -118,9 +120,9 @@ function success = build(varargin)
   % Try manual config first
   config;
 
-  if ~testzmq(ZMQ_LIB_PATH) || ~testzmq(ZMQ_INCLUDE_PATH)
+  if (~testzmq(ZMQ_LIB_PATH) || ~testzmq(ZMQ_INCLUDE_PATH))
     % Default fallback
-    if ispc
+    if (ispc)
       % == WINDOWS ==
       config_win;
     else
@@ -128,7 +130,7 @@ function success = build(varargin)
       config_unix;
     end
 
-    if ~testzmq(ZMQ_LIB_PATH) || ~testzmq(ZMQ_INCLUDE_PATH)
+    if (~testzmq(ZMQ_LIB_PATH) || ~testzmq(ZMQ_INCLUDE_PATH))
       error('make:matlab-zmq:badConfig', ...
         'Could not find ZMQ files, please edit ''config.m'' and try again.');
     end
@@ -181,7 +183,7 @@ function success = build(varargin)
     orig_zmq_include_path, orig_zmq_lib_path, orig_zmq_lib);
 end
 
-%% Auxiliar functions
+%% Aux functions
 
 function compile(flags, file, outputdir)
   % Compile files
@@ -268,7 +270,7 @@ function response = testzmq(folder)
   end
 end
 
-function [make_path, lib_path, src_path, test_path] = get_paths
+function [make_path, lib_path, src_path, test_path] = get_paths()
   % Return the paths used for this library
 
   [make_path, ~, ~] = fileparts(mfilename('fullpath'));
