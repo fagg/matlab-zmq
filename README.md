@@ -15,6 +15,13 @@ Getting Started
 + Make sure you have ZMQ 4.0.4 installed. Change settings in `config.m` to point to your installation.
 + Ensure you have mex configured [[1]](http://www.mathworks.com/help/matlab/matlab_external/what-you-need-to-build-mex-files.html) [[2]](http://www.mathworks.com/support/compilers/R2014b/index.html)
 + Run `make.m`
++ Make sure that the lib directory is on your MATLAB path.
++ Start hacking.
+
+Stuff Doesn't Work
+------------------
+
+Check out my dev branch, see if that works. Failing that, open an issue.
 
 Can I help?
 -----------
@@ -32,5 +39,5 @@ Contributors
 
 The following people have made contributions to this library (with my sincere thanks):
 
-- Anderson Bravalheri (@abravalheri - Initial support for Windows)
+- Anderson Bravalheri (@abravalheri - Initial support for Windows, Octave support, test framework + many other contributions.)
 

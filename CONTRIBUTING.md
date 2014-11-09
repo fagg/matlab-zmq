@@ -18,7 +18,8 @@ if (this)
     do_that();
 else
     do_something_else();
-/* or */
+
+/* good: */
 if (this) {
     do_that();
 } else {
