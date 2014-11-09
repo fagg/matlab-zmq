@@ -29,6 +29,8 @@ Can I help?
 Yep -  pull requests, patches, comments, questions, concerns, outright abuse are welcome. I am working on this project
 in my free time, which is limited, so if you are interested in helping I welcome your input.
 
+Please be aware of the dev branch, also. However, when in doubt, base commits in master.
+
 How can I contact you?
 -----------------------
 
