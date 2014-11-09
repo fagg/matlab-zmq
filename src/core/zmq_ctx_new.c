@@ -17,6 +17,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
                  "Error: ZMQ context instantiation failed.");
     }
 
+    /* TODO: Refactor this */
     /* Are we on a 32 or 64 bit machine?  */
     if (sizeof(void*) == 4) {
         plhs[0] = mxCreateNumericMatrix(1, 1, mxUINT32_CLASS, mxREAL);

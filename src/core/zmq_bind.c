@@ -30,12 +30,15 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     if (socket == NULL) return;
 
     endpoint = (char*) str_from_m(prhs[1]);
-    if (endpoint == NULL) return;
+    if (endpoint == NULL) 
+        return;
 
     rc = zmq_bind(socket, endpoint);
 
-    if (rc < 0) handle_error();
-    else plhs[0] = int_to_m((void*) &rc);
+    if (rc < 0) 
+        handle_error();
+    else
+        plhs[0] = int_to_m((void*) &rc);
 
     mxFree(endpoint);
 }
