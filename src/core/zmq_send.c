@@ -6,11 +6,10 @@
 #include <mex.h>
 
 
-/* TODO: Clean up, inline declarations. 
- * TODO: Write tests.
+/* TODO: Clean up, inline declarations.
  */
-void configure_message(const mxArray *, void * , size_t *);
-int configure_flag(const mxArray *, int );
+void configure_message(const mxArray *, void **, size_t *);
+int configure_flag(const mxArray **, int );
 
 void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 {
@@ -20,25 +19,40 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     int coreAPIReturn, coreAPIOptionFlag = 0;
 
     /* Configure the message payload */
-    configure_message(prhs[1], payload, &payloadLen);
+    configure_message(prhs[1], &payload, &payloadLen);
+    if (payload == NULL)
+        return;
 
     /* Get the options for sending */
     if (nrhs > 2)
-        coreAPIOptionFlag = configure_flag(prhs, nrhs);
+        coreAPIOptionFlag = configure_flag(&(prhs[2]), nrhs - 2);
 
-    coreAPIReturn = zmq_send(socket, payload, payloadLen * sizeof(uint8), coreAPIOptionFlag);
-    if (coreAPIReturn != 0)
-        handle_error();
-    else
-        plhs[0] = int_to_m( (void *) coreAPIReturn);
+    socket = pointer_from_m(prhs[0]);
+    if (socket != NULL) {
+        coreAPIReturn = zmq_send(socket, payload, payloadLen * sizeof(uint8_t), coreAPIOptionFlag);
+        if (coreAPIReturn < 0)
+            handle_error();
+        else
+            plhs[0] = int_to_m( (void *) &coreAPIReturn);
+    } else {
+        mexErrMsgIdAndTxt("zmq:send:invalidSocket", "Error: Invalid socket.");
+    }
 
     mxFree(payload);
 }
 
-void configure_message(const mxArray *rawMessage, void *payload, size_t *payloadLen)
+void configure_message(const mxArray *rawMessage, void **payload, size_t *payloadLen)
 {
     /* We don't care what we're sending, just send it in a dumb way and let higher levels
-     * deal with typing and reconstruction of dimensions, tensors etc (i.e. serialize with JSON) */
+     * deal with typing and reconstruction of dimensions, tensors etc (i.e. serialize with JSON)
+     *
+     * Reasons for using uint8:
+     * - Reported inconsistencies when using strings due enconding:
+     *   https://github.com/yida/msgpack-matlab/blob/master/README.md
+     *
+     * Reasons for restricting input to a row vector:
+     * - Uncertainty when differentiating message shapes,
+     *   e. g. [1 2; 3 4; 5 6], [1 2 3; 4 5 6], [1 2 3 4 5 6]. */
     if (mxGetM(rawMessage) != 1) {
         mexErrMsgIdAndTxt("zmq:send:messageNotRowVec",
                 "Error: Message must be a row vector. Flatten before attempting to send.");
@@ -50,17 +64,17 @@ void configure_message(const mxArray *rawMessage, void *payload, size_t *payload
 
     *payloadLen = mxGetN(rawMessage);
 
-    *payload = (uint8_t *) uint8_array_from_m(rawMessage, *payloadLen);
+    *payload = uint8_array_from_m(rawMessage, *payloadLen);
     if (payload == NULL) {
         mexErrMsgIdAndTxt("zmq:send:messageIsEmpty", "Error: You're trying to send an empty message.");
     }
 }
 
-int configure_flag(const mxArray *params, int nParams)
+int configure_flag(const mxArray **params, int nParams)
 {
-    int i = 2, coreAPIOptionFlag = 0;
+    int i, coreAPIOptionFlag = 0;
     char *flagStr = NULL;
-    for ( ; i<nParams; i++) {
+    for (i = 0 ; i<nParams; i++) {
         flagStr = (char *) str_from_m(params[i]);
         if (flagStr != NULL) {
             if (strcmp(flagStr, "ZMQ_SNDMORE") == 0)
@@ -72,4 +86,6 @@ int configure_flag(const mxArray *params, int nParams)
             mxFree(flagStr);
         }
     }
+
+    return coreAPIOptionFlag;
 }
