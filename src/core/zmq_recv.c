@@ -5,76 +5,118 @@
 #include <zmq.h>
 #include <string.h>
 
+#define DEFAULT_BUFFER_LENGTH 255
+
+int configure_flag(const mxArray **, int);
+void configure_return(int, mxArray **, int, size_t, void *);
+size_t configure_buffer_length(const mxArray **, int *);
+
 void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 {
-    void* socket = NULL;
-    void* buffer = NULL;
-    char* option = NULL;
-    size_t msgLen = 0;   /* message length */
-    size_t bufLen = 255; /* default buffer length */
-    size_t* param = NULL;
-    int i, flags = 0;
+    void *socket = NULL;
+    void *buffer = NULL;
+    size_t bufLen = DEFAULT_BUFFER_LENGTH;
+    int optionStart = 1;  /* from which index options can be passed */
+    int coreAPIReturn, coreAPIOptionFlag = 0;
 
     if (nrhs < 1) {
         mexErrMsgIdAndTxt("zmq:recv:invalidArgs",
-                "Error: Ate least one argument is required: socket.");
+                "Error: At least one argument is required: socket.");
         return;
     }
 
     if (nrhs >= 2) {
-        if (mxIsNumeric(prhs[1])) {
-            i = 2; /* Start to search options form 3th argument */
-            param = (size_t*) size_t_from_m(prhs[1]);
-            if (param != NULL) {
-                bufLen = (size_t) *param;
-                mxFree(param);
-            } else {
-                mexWarnMsgIdAndTxt("zmq:recv:unknowOops", "Unable to convert parameter.");
-            }
-        } else {
-            i = 1; /* Start to search options form 2th argument */
-        }
+        /* Check if the user has chosen a bufLen,
+         * if so get it and update the index where options should start */
+        bufLen = configure_buffer_length(prhs, &optionStart);
+        if (bufLen == 0)
+            return;
 
-        /* Parse options and store the binary flags */
-        for (; i < nrhs; i++) {
-            option = (char*) str_from_m(prhs[i]);
-
-            if (option != NULL) {
-                if (!strcmp(option, "ZMQ_DONTWAIT")) {
-                    flags |= ZMQ_DONTWAIT;
-                } else if (!strcmp(option, "ZMQ_SNDMORE")) {
-                    flags |= ZMQ_SNDMORE;
-                } else {
-                    mexWarnMsgIdAndTxt("zmq:recv:invalidOption", "Unknow option '%s'", option);
-                }
-
-                mxFree(option);
-            }
-        }
+        /* Get the options for receiving */
+        coreAPIOptionFlag = configure_flag(&(prhs[optionStart]), nrhs - optionStart);
     }
 
     socket = pointer_from_m(prhs[0]);
-    if (socket == NULL) return;
+    if (socket == NULL) {
+        mexErrMsgIdAndTxt("zmq:recv:invalidSocket", "Error: Invalid socket.");
+        return;
+    }
 
+    /* Create buffer and call API */
     buffer = (uint8_t*) mxCalloc(bufLen, sizeof(uint8_t));
-    msgLen = zmq_recv(socket, buffer, bufLen*sizeof(uint8_t), flags);
+    if (buffer == NULL) {
+        mexErrMsgIdAndTxt("util:calloc", "Error: Unsuccessful memory allocation.");
+        return;
+    }
 
-    if (msgLen < 0) {
+    coreAPIReturn = zmq_recv(socket, buffer, bufLen * sizeof(uint8_t), coreAPIOptionFlag);
+
+    if (coreAPIReturn < 0) {
         handle_error();
     } else {
-        if (msgLen > bufLen) {
-            mexWarnMsgIdAndTxt("zmq:recv:bufferTooSmall",
-                "Message is %d bytes long, but buffer is %d. Truncated.",
-                msgLen, bufLen);
-            plhs[0] = uint8_array_to_m((void*) buffer, bufLen);
-        } else {
-            plhs[0] = uint8_array_to_m((void*) buffer, msgLen);
-        }
-
-        if (nlhs > 1) {
-            plhs[1] = size_t_to_m((void*) &msgLen);
-        }
+        /* Prepare the values that should be returned to MATLAB */
+        configure_return(nlhs, plhs, coreAPIReturn, bufLen, buffer);
     }
 
     mxFree(buffer);
+}
+
+/* Discover which options are passed by the user, and calculate the
+ * corresponding flag */
+int configure_flag(const mxArray **params, int nParams)
+{
+    int i, coreAPIOptionFlag = 0;
+    char *flagStr = NULL;
+
+    for (i = 0 ; i < nParams; i++) {
+        flagStr = (char *) str_from_m(params[i]);
+        if (flagStr != NULL) {
+            if(strcmp(flagStr, "ZMQ_DONTWAIT") == 0)
+                coreAPIOptionFlag |= ZMQ_DONTWAIT;
+            else
+                mexErrMsgIdAndTxt("zmq:recv:invalidFlag", "Error: Unknown flag.");
+            mxFree(flagStr);
+        }
+    }
+
+    return coreAPIOptionFlag;
+}
+
+/* Check if the message was truncated, advising user and avoiding memory waste
+ * while prepare it to return to MATLAB. Also handle the second optional return */
+void configure_return(int nlhs, mxArray **plhs, int msgLen, size_t bufLen, void *buffer) {
+    if (msgLen > bufLen) {
+        mexWarnMsgIdAndTxt("zmq:recv:bufferTooSmall",
+            "Message is %d bytes long, but buffer is %d. Truncated.",
+            msgLen, bufLen);
+        plhs[0] = uint8_array_to_m((void*) buffer, bufLen);
+    } else {
+        plhs[0] = uint8_array_to_m((void*) buffer, msgLen);
+    }
+
+    if (nlhs > 1) {
+        plhs[1] = int_to_m((void*) &msgLen);
+    }
+}
+
+/* Check if the param in the index is an number
+ * if so, convert it from MATLAB and increments the index */
+size_t configure_buffer_length(const mxArray **param, int *paramIndex)
+{
+    size_t length = DEFAULT_BUFFER_LENGTH;
+    size_t *input;
+
+    if (mxIsNumeric(param[*paramIndex])) {
+        input = (size_t*) size_t_from_m(param[*paramIndex]);
+        *paramIndex += 1;
+        if (input != NULL) {
+            length = *input;
+            mxFree(input);
+        } else {
+            mexErrMsgIdAndTxt("zmq:recv:unknowOops", "Unable to convert parameter.");
+            return 0;
+        }
+    }
+
+    return length;
 }
