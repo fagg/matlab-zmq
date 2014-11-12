@@ -33,14 +33,16 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 
     /* Discover which option should be used */
     option = (char*) str_from_m(prhs[1]);
-    if (option == NULL) return;
-
+    if (option == NULL) 
+        return;
 
     optDesc = find_sockopt_by_name(option);
-    if (optDesc == NULL) return;
+    if (optDesc == NULL) 
+        return;
 
     typeDesc = find_sockopt_type_by_id(optDesc->typeId);
-    if (typeDesc == NULL) return;
+    if (typeDesc == NULL) 
+        return;
 
     mxFree(option);
 
