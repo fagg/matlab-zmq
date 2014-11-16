@@ -1,12 +1,6 @@
 function test_zmq_req_rep
-    %% open session
-    ctx = zmq_ctx_new();
-
-    client = zmq_socket(ctx, 'ZMQ_REQ');
-    zmq_connect(client, 'tcp://127.0.0.1:30000');
-
-    server = zmq_socket(ctx, 'ZMQ_REP');
-    zmq_bind(server, 'tcp://127.0.0.1:30000');
+    [ctx, server, client] = setup;
+    cleanupObj = onCleanup(@() teardown(ctx, server, client));
 
     %% client test - request send
     msgSent = uint8('request');
@@ -46,7 +40,20 @@ function test_zmq_req_rep
     %% client test - cannot send 2 messages in a row (unless multipart)
     assert_does_not_throw(@zmq_send, client, msgSent);
     assert_throw(@zmq_send, client, msgSent);
+end
 
+function [ctx, server, client] = setup
+    %% open session
+    ctx = zmq_ctx_new();
+
+    client = zmq_socket(ctx, 'ZMQ_REQ');
+    zmq_connect(client, 'tcp://127.0.0.1:30000');
+
+    server = zmq_socket(ctx, 'ZMQ_REP');
+    zmq_bind(server, 'tcp://127.0.0.1:30000');
+end
+
+function teardown(ctx, server, client)
     %% close session
     zmq_unbind(server, 'tcp://127.0.0.1:30000');
     zmq_close(server);
