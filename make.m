@@ -60,7 +60,7 @@ function success = clean(varargin)
   if nargin > 0
     rubbish = varargin;
   else
-    rubbish = {'+zmq/+core/*.mex*', '*.o', '*.asv', '*.m~'};
+    rubbish = {'lib/+zmq/+core/*.mex*', '*.o', '*.asv', '*.m~'};
   end
 
   for n = 1:length(rubbish)
@@ -85,11 +85,13 @@ function success = run_tests(varargin)
   % run.
   %
   % Notice that the files will be considered relative to `tests` directory.
-  [~, ~, ~, test_path] = get_paths;
+  [make_path, ~, ~, test_path] = get_paths;
 
   % save current path
   original_path = path;
   addpath(test_path);
+  % point at the core package. TODO: this could be tidier
+  addpath(fullfile(make_path, 'lib'));
   cleanup = onCleanup(@() path(original_path)); % restore path after finish
   success = runner(varargin{:});
 end
@@ -270,7 +272,7 @@ function [make_path, lib_path, src_path, test_path] = get_paths()
   % Return the paths used for this library
 
   [make_path, ~, ~] = fileparts(mfilename('fullpath'));
-  lib_path = fullfile(make_path, '+zmq/+core');
+  lib_path = fullfile(make_path, 'lib/+zmq/+core');
   src_path = fullfile(make_path, 'src');
   test_path = fullfile(make_path, 'tests');
 end
