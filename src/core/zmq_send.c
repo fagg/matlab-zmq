@@ -1,9 +1,9 @@
 #include <util/socket.h>
 #include <util/conversions.h>
 #include <util/errors.h>
-#include <string.h>
-#include <zmq.h>
 #include <mex.h>
+#include <zmq.h>
+#include <string.h>
 
 
 /* TODO: Clean up, inline declarations.
