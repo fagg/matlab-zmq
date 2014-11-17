@@ -90,15 +90,7 @@ function success = run_tests(varargin)
   % save current path
   original_path = path;
   addpath(test_path);
-<<<<<<< HEAD
-<<<<<<< HEAD
-  addpath(lib_path);
   cleanup = onCleanup(@() path(original_path)); % restore path after finish
-=======
->>>>>>> Refactored core API to a package; Updated tests
-=======
->>>>>>> 516bdcdd4ad2345f1e5d58e4d97b32742ef00208
-
   success = runner(varargin{:});
 end
 
@@ -282,3 +274,8 @@ function [make_path, lib_path, src_path, test_path] = get_paths()
   src_path = fullfile(make_path, 'src');
   test_path = fullfile(make_path, 'tests');
 end
+
+
+
+
+
