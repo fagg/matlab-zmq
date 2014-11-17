@@ -1,7 +1,7 @@
-% zmq_ctx_shutdown - Shutdown a ZMQ context.
+% zmq.core.ctx_shutdown - Shutdown a ZMQ context.
 %
-% Usage: zmq_ctx_shutdown(context)
+% Usage: zmq.core.ctx_shutdown(context)
 %
-% Input: context - Instantiated ZMQ context handle (see zmq_ctx_new).
+% Input: context - Instantiated ZMQ context handle (see zmq.core.ctx_new).
 %
 % Output: None.

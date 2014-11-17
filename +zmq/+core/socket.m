@@ -1,8 +1,8 @@
-% zmq_ctx_new - Create a ZMQ socket
+% zmq.core.ctx_new - Create a ZMQ socket
 %
-% Usage: socket = zmq_socket(context, type)
+% Usage: socket = zmq.core.socket(context, type)
 %
-% Input: context - Instantiated ZMQ context handle (see zmq_ctx_new).
+% Input: context - Instantiated ZMQ context handle (see zmq.core.ctx_new).
 %        type    - type string of messaging pattern to be executed by this socket.
 %                  Please refer to http://api.zeromq.org/master:zmq-socket for a
 %                  complete description. Examples:7
@@ -12,10 +12,10 @@
 %                             in a fan out fashion to all connected peers.
 %                  * ZMQ_SUB: used by a subscriber to subscribe to data distributed by a publisher.
 %                             Initially a ZMQ_SUB socket is not subscribed to any messages,
-%                             use the ZMQ_SUBSCRIBE option of zmq_setsockopt to specify which
+%                             use the ZMQ_SUBSCRIBE option of zmq.core.setsockopt to specify which
 %                             messages to subscribe to.
 %
 % Output: Handle to the newly created socket, unbound, and not associated with endpoints.
 %         In order to establish a message flow a socket must first be connected to at least one
-%         endpoint (see zmq_connect), or at least one endpoint must be created for accepting
-%         incoming connections with (see zmq_bind).
+%         endpoint (see zmq.core.connect), or at least one endpoint must be created for accepting
+%         incoming connections with (see zmq.core.bind).

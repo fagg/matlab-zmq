@@ -1,8 +1,8 @@
-% zmq_ctx_get - Mex function for interacting with ZMQ Contexts.
+% zmq.core.ctx_get - Mex function for interacting with ZMQ Contexts.
 %
-% Usage: output = zmq_ctx_get(context, option_name)
+% Usage: output = zmq.core.ctx_get(context, option_name)
 %
-% Input: context - Instantiated ZMQ context handle (see zmq_ctx_new).
+% Input: context - Instantiated ZMQ context handle (see zmq.core.ctx_new).
 %        option_name - Option string. Must be one of the following:
 %                      * ZMQ_IO_THREADS - Number of I/O threads in context thread pool.
 %                      * ZMQ_MAX_SOCKETS - Maximum number of sockets allowed on context.

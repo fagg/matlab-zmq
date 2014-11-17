@@ -1,6 +1,6 @@
-% zmq_ctx_new - Create new context for use with ZMQ functions
+% zmq.core.ctx_new - Create new context for use with ZMQ functions
 %
-% Usage: context = zmq_ctx_new
+% Usage: context = zmq.core.ctx_new
 %
 % Input: None
 %

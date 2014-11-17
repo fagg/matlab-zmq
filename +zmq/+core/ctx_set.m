@@ -1,8 +1,8 @@
-% zmq_ctx_set - Mex function for setting ZMQ context options. Complementary to zmq_ctx_get.
+% zmq.core.ctx_set - Mex function for setting ZMQ context options. Complementary to zmq.core.ctx_get.
 %
-% Usage: zmq_ctx_set(context, option_name, option_value).
+% Usage: zmq.core.ctx_set(context, option_name, option_value).
 %
-% Input: context - Instantiated ZMQ context handle (see zmq_ctx_new).
+% Input: context - Instantiated ZMQ context handle (see zmq.core.ctx_new).
 %        option_name - Option string. Must be one of the following:
 %                      * ZMQ_IO_THREADS - Number of I/O threads in context thread pool.
 %                      * ZMQ_MAX_SOCKETS - Maximum number of sockets allowed on context.

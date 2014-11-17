@@ -1,5 +1,5 @@
-% zmq_version - Retrieve ZMQ version.
+% zmq.core.version - Retrieve ZMQ version.
 %
 % Usage:
-%   zmq_version;     % Prints ZMQ version to MATLAB console.
-%   v = zmq_version; % Return version string (e.g. '4.0.4').
+%   zmq.core.version;     % Prints ZMQ version to MATLAB console.
+%   v = zmq.core.version; % Return version string (e.g. '4.0.4').
