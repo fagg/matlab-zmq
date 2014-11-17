@@ -1,7 +1,7 @@
 function test_zmq_setsockopt
     % let's just create a dummy socket
-    ctx = zmq_ctx_new();
-    socket = zmq_socket(ctx, 'ZMQ_REQ');
+    ctx = zmq.core.ctx_new();
+    socket = zmq.core.socket(ctx, 'ZMQ_REQ');
 
     % -- Options not tested here------------------------------------------------- %
     %% Read-Only properties
@@ -63,10 +63,10 @@ function test_zmq_setsockopt
         option = common_options{n}{1};
         value = common_options{n}{2};
 
-        response = assert_does_not_throw(@zmq_setsockopt, socket, option, value);
+        response = assert_does_not_throw(@zmq.core.setsockopt, socket, option, value);
         assert(response == 0, 'status code should be 0, %d given.', response);
 
-        response = zmq_getsockopt(socket, option);
+        response = zmq.core.getsockopt(socket, option);
         if ~ischar(value)
             condition = response == value;
             % display
@@ -83,7 +83,7 @@ function test_zmq_setsockopt
     end
 
     % close session
-    zmq_close(socket);
-    zmq_ctx_shutdown(ctx);
-    zmq_ctx_term(ctx);
+    zmq.core.close(socket);
+    zmq.core.ctx_shutdown(ctx);
+    zmq.core.ctx_term(ctx);
 end
