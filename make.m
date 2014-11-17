@@ -163,12 +163,12 @@ function success = build(varargin)
 
   lib_path = reducepath(lib_path); % Windows :(
 
-  build_function = @(file) compile(zmq_compile_flags, file, lib_path);
+  build_function = @(file) compile(zmq_compile_flags, file, fullfile(lib_path,'+zmq/+core'));
   cellfun(build_function, COMPILE_LIST);
 
   clean('*.o');
 
-  files = ls(fullfile(lib_path, '*.mex*'));
+  files = ls(fullfile(fullfile(lib_path, '+zmq/+core'), '*.mex*'));
   if size(files, 1) == length(COMPILE_LIST)
     success = true;
     fprintf('\nSuccesful build for:\n');
@@ -272,7 +272,7 @@ function [make_path, lib_path, src_path, test_path] = get_paths()
   % Return the paths used for this library
 
   [make_path, ~, ~] = fileparts(mfilename('fullpath'));
-  lib_path = fullfile(make_path, 'lib/+zmq/+core');
+  lib_path = fullfile(make_path, 'lib/');
   src_path = fullfile(make_path, 'src');
   test_path = fullfile(make_path, 'tests');
 end
