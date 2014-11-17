@@ -13,9 +13,9 @@ function pub_server(varargin)
         port =  varargin{1};
     end
 
-    context = zmq_ctx_new();
-    socket = zmq_socket(context, 'ZMQ_PUB');
-    zmq_bind(socket, sprintf('tcp://*:%d', port));
+    context = zmq.core.ctx_new();
+    socket = zmq.core.socket(context, 'ZMQ_PUB');
+    zmq.core.bind(socket, sprintf('tcp://*:%d', port));
 
     fprintf('Broadcasting temperature information...\n');
     while (1)
@@ -23,7 +23,7 @@ function pub_server(varargin)
         data = randi([10, 45]);              % Pick a random temperature
         message = sprintf('%d %d', topic, data);
         fprintf('%s\n', message);
-        zmq_send(socket, uint8(message));
+        zmq.core.send(socket, uint8(message));
         delay(1);
     end
 end
