@@ -9,10 +9,17 @@
 % Input: socket - Instantiated ZMQ socket handle (see zmq_socket).
 %        bufferLength - Size in bytes of buffer pre-allocated to receive message.
 %                       This parameter is optional with default value of 255.
+<<<<<<< HEAD
 %        options - List of strings containing the name of option for transmission.
 %
 % Output: uint8 array containing binary data received. If a second output is required
 %         the length of message will be provided.
+=======
+%        options - List of strings containing the options' names for reception.
+%
+% Output: uint8 array containing binary data received. If a second output is required,
+%         the length of the message will be provided.
+>>>>>>> 387c819da2b753383aefd85df9090ea8861870a5
 %
 % An application that processes multi-part messages must check the 'ZMQ_RCVMORE'
 % option with `zmq_getsockopt` after calling `zmq_recv` to determine if there
@@ -28,9 +35,15 @@
 %
 % NOTICE
 %  - The message received should be a uint8 row vector. Please consider using
+<<<<<<< HEAD
 %    `char`, `cast` and `typecast` functions before using it. Make shure to know
 %    what is the transmitter encoding when receiveing strings, so you can use
 %    conversions when it's neeeded, for example:
+=======
+%    `char`, `cast` and `typecast` functions before using it. Make sure to know
+%    what is the transmitter encoding when receiveing strings, so you can use
+%    conversions if they're neeeded, for example:
+>>>>>>> 387c819da2b753383aefd85df9090ea8861870a5
 %      `unicode2native(str, 'UTF-8')` or
 %      `feature('DefaultCharacterSet', 'UTF-8')`.
 %  - If the pre-allocated buffer is shorter than the message received, the returned

@@ -5,83 +5,87 @@
 #include <zmq.h>
 #include <string.h>
 
+
+/* TODO: Clean up, inline declarations.
+ */
+void configure_message(const mxArray *, void **, size_t *);
+int configure_flag(const mxArray **, int );
+
 void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 {
-    void* socket = NULL;
-    void* buffer = NULL;
-    char* option = NULL;
-    size_t len = 0;
-    int i, rc, flags = 0;
+    void *socket = NULL;
+    void *payload = NULL;
+    size_t payloadLen = 0;
+    int coreAPIReturn, coreAPIOptionFlag = 0;
 
-    if (nrhs < 2) {
-        mexErrMsgIdAndTxt("zmq:send:invalidArgs",
-                "Error: Ate least two arguments are required: socket, message.");
+    /* Configure the message payload */
+    configure_message(prhs[1], &payload, &payloadLen);
+    if (payload == NULL)
         return;
-    }
-    /*
-      I think it's a good design decision to enforce binary data transmission with
-      a uint8 row vector parameter. The reasons are:
 
-      - Since Matlab string encoding can be different from system to system,
-        just assuming message type as char string could lead to misrepresentation,
-        memory waste or even difficulties of understanding the behavior for both
-        zmq_send and zmq_recv.
-        (Reported in: https://github.com/yida/msgpack-matlab/blob/master/README.md)
-
-      - In the receiver side there is no way to recover the original message
-        shape just having the binary data, this would require a protocol.
-        So if we permit multidimensional messages sending, the receiver side
-        could not differentiate messages like [1 2; 3 4; 5 6], [1 2 3; 4 5 6],
-        [1 2 3 4 5 6], leading the inattentive user to frustration and madness.
-     */
-    if (mxIsUint8(prhs[1]) != 1) {
-        mexErrMsgIdAndTxt("zmq:send:invalidMessage",
-                "Error: message is not a uint8 vector. "
-                "Please consider using `uint8`, `cast` and `typecast` "
-                "before send data.");
-        return;
-    }
-
-    if (mxGetM(prhs[1]) != 1) {
-        mexErrMsgIdAndTxt("zmq:send:invalidMessageDimensions",
-                "Error: message is not a row vector. "
-                "Please consider using `reshape` before send data.");
-        return;
-    }
+    /* Get the options for sending */
+    if (nrhs > 2)
+        coreAPIOptionFlag = configure_flag(&(prhs[2]), nrhs - 2);
 
     socket = pointer_from_m(prhs[0]);
-    if (socket == NULL) return;
+    if (socket != NULL) {
+        coreAPIReturn = zmq_send(socket, payload, payloadLen * sizeof(uint8_t), coreAPIOptionFlag);
+        if (coreAPIReturn < 0)
+            handle_error();
+        else
+            plhs[0] = int_to_m( (void *) &coreAPIReturn);
+    } else {
+        mexErrMsgIdAndTxt("zmq:send:invalidSocket", "Error: Invalid socket.");
+    }
 
-    len = mxGetN(prhs[1]);
-    /* Let's just copy message and manage memory directly... it's easier */
-    buffer = (uint8_t*) uint8_array_from_m(prhs[1], len);
-    if (buffer == NULL) return;
+    mxFree(payload);
+}
 
-    if (nrhs > 2) {
-        /* Parse options and store the binary flags */
-        for (i = 2; i < nrhs; i++) {
-            option = (char*) str_from_m(prhs[i]);
+void configure_message(const mxArray *rawMessage, void **payload, size_t *payloadLen)
+{
+    /* We don't care what we're sending, just send it in a dumb way and let higher levels
+     * deal with typing and reconstruction of dimensions, tensors etc (i.e. serialize with JSON)
+     *
+     * Reasons for using uint8:
+     * - Reported inconsistencies when using strings due enconding:
+     *   https://github.com/yida/msgpack-matlab/blob/master/README.md
+     *
+     * Reasons for restricting input to a row vector:
+     * - Uncertainty when differentiating message shapes,
+     *   e. g. [1 2; 3 4; 5 6], [1 2 3; 4 5 6], [1 2 3 4 5 6]. */
+    if (mxGetM(rawMessage) != 1) {
+        mexErrMsgIdAndTxt("zmq:send:messageNotRowVec",
+                "Error: Message must be a row vector. Flatten before attempting to send.");
+    }
+    if (mxIsUint8(rawMessage) != 1) {
+        mexErrMsgIdAndTxt("zmq:send:messageNotUint8",
+                "Error: Message payload must be uint8");
+    }
 
-            if (option != NULL) {
-                if (!strcmp(option, "ZMQ_DONTWAIT")) {
-                    flags |= ZMQ_DONTWAIT;
-                } else if (!strcmp(option, "ZMQ_SNDMORE")) {
-                    flags |= ZMQ_SNDMORE;
-                } else {
-                    mexWarnMsgIdAndTxt("zmq:send:invalidOption", "Unknow option '%s'", option);
-                }
+    *payloadLen = mxGetN(rawMessage);
 
-                mxFree(option);
-            }
+    *payload = uint8_array_from_m(rawMessage, *payloadLen);
+    if (payload == NULL) {
+        mexErrMsgIdAndTxt("zmq:send:messageIsEmpty", "Error: You're trying to send an empty message.");
+    }
+}
+
+int configure_flag(const mxArray **params, int nParams)
+{
+    int i, coreAPIOptionFlag = 0;
+    char *flagStr = NULL;
+    for (i = 0 ; i<nParams; i++) {
+        flagStr = (char *) str_from_m(params[i]);
+        if (flagStr != NULL) {
+            if (strcmp(flagStr, "ZMQ_SNDMORE") == 0)
+                coreAPIOptionFlag |= ZMQ_SNDMORE;
+            else if(strcmp(flagStr, "ZMQ_DONTWAIT") == 0)
+                coreAPIOptionFlag |= ZMQ_DONTWAIT;
+            else
+                mexErrMsgIdAndTxt("zmq:send:invalidFlag", "Error: Unknown flag.");
+            mxFree(flagStr);
         }
     }
 
-    rc = zmq_send(socket, buffer, len*sizeof(uint8_t), flags);
-
-    if (rc < 0)
-        handle_error();
-    else
-        plhs[0] = int_to_m((void*) &rc);
-
-    mxFree(buffer);
+    return coreAPIOptionFlag;
 }
