@@ -50,7 +50,7 @@ function success = clean(varargin)
   %  - [...]: Variable list of paths to be deleted, relative to this file.
   %           No recursive glob patterns can be used.
   %
-  % If no argument is provided, all 'lib/*.mex*', '*.o', '*.asv', '*.m~' files
+  % If no argument is provided, all '+zmq/+core/*.mex*', '*.o', '*.asv', '*.m~' files
   % will be remvoed.
   %
   % NOTICE: Without arguments, it will purge the created bindings.
@@ -60,7 +60,7 @@ function success = clean(varargin)
   if nargin > 0
     rubbish = varargin;
   else
-    rubbish = {'lib/*.mex*', '*.o', '*.asv', '*.m~'};
+    rubbish = {'+zmq/+core/*.mex*', '*.o', '*.asv', '*.m~'};
   end
 
   for n = 1:length(rubbish)
@@ -85,13 +85,16 @@ function success = run_tests(varargin)
   % run.
   %
   % Notice that the files will be considered relative to `tests` directory.
-  [~, lib_path ~, test_path] = get_paths;
+  [~, ~, ~, test_path] = get_paths;
 
   % save current path
   original_path = path;
   addpath(test_path);
+<<<<<<< HEAD
   addpath(lib_path);
   cleanup = onCleanup(@() path(original_path)); % restore path after finish
+=======
+>>>>>>> Refactored core API to a package; Updated tests
 
   success = runner(varargin{:});
 end
@@ -272,7 +275,7 @@ function [make_path, lib_path, src_path, test_path] = get_paths()
   % Return the paths used for this library
 
   [make_path, ~, ~] = fileparts(mfilename('fullpath'));
-  lib_path = fullfile(make_path, 'lib');
+  lib_path = fullfile(make_path, '+zmq/+core');
   src_path = fullfile(make_path, 'src');
   test_path = fullfile(make_path, 'tests');
 end

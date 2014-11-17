@@ -1,4 +1,5 @@
 function success = runner(varargin)
+<<<<<<< HEAD
     % Run tests for the library
     %
     % ## Arguments
@@ -10,7 +11,7 @@ function success = runner(varargin)
     % Notice that the files will be considered relative to this file.
 
     [testPath, ~, ~] = fileparts(mfilename('fullpath'));
-
+    
     % save current path
     origPath = path;
     addpath(testPath);
@@ -83,6 +84,5 @@ function output = find_test(stack)
     while (isempty(regexp(stack(n).name, '^test', 'once')) && n < l)
         n = n + 1;
     end
-
-    output = stack(n);
+  output = stack(n);
 end

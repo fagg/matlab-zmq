@@ -42,7 +42,7 @@ function test_zmq_getsockopt
         option = defaultOptions{n}{1};
         value = defaultOptions{n}{2};
 
-        response = assert_does_not_throw(@zmq_getsockopt, socket, option);
+        response = assert_does_not_throw(@zmq.core.getsockopt, socket, option);
 
         if ~ischar(value)
             condition = response == value;
@@ -62,13 +62,17 @@ end
 
 function [ctx, socket] = setup
     % let's just create and destroy a dummy socket
-    ctx = zmq_ctx_new();
-    socket = zmq_socket(ctx, 'ZMQ_REP');
+    ctx = zmq.core.ctx_new();
+    socket = zmq.core.socket(ctx, 'ZMQ_REP');
 end
 
 function teardown(ctx, socket)
     % close session
-    zmq_close(socket);
-    zmq_ctx_shutdown(ctx);
-    zmq_ctx_term(ctx);
+    zmq.core.close(socket);
+    zmq.core.ctx_shutdown(ctx);
+    zmq.core.ctx_term(ctx);
 end
+
+
+
+
