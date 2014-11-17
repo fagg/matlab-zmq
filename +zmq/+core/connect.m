@@ -1,8 +1,8 @@
-% zmq_bind - Create outgoing connection from socket on a endpoint.
+% zmq.core.bind - Create outgoing connection from socket on a endpoint.
 %
-% Usage: status = zmq_connect(socket, endpoint)
+% Usage: status = zmq.core.connect(socket, endpoint)
 %
-% Input: socket   - Instantiated ZMQ socket handle (see zmq_socket).
+% Input: socket   - Instantiated ZMQ socket handle (see zmq.core.socket).
 %        endpoint - String consisting of a 'transport://' followed by an 'address'.
 %                   The 'transport' specifies the underlying protocol to use.
 %                   The address specifies the transport-specific address to connect to.

@@ -1,9 +1,9 @@
-% zmq_bind - Binds the socket to a local endpoint and then accepts incoming
+% zmq.core.bind - Binds the socket to a local endpoint and then accepts incoming
 %            connections on that endpoint.
 %
-% Usage: status = zmq_bind(socket, endpoint)
+% Usage: status = zmq.core.bind(socket, endpoint)
 %
-% Input: socket   - Instantiated ZMQ socket handle (see zmq_socket).
+% Input: socket   - Instantiated ZMQ socket handle (see zmq.core.socket).
 %        endpoint - String consisting of a 'transport://' followed by an 'address'.
 %                   The transport specifies the underlying protocol to use.
 %                   The address specifies the transport-specific address to bind to.
