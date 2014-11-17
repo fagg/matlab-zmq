@@ -91,11 +91,9 @@ function success = run_tests(varargin)
   original_path = path;
   addpath(test_path);
   addpath(lib_path);
+  cleanup = onCleanup(@() path(original_path)); % restore path after finish
 
   success = runner(varargin{:});
-
-  % restore path
-  path(original_path);
 end
 
 function success = build(varargin)

@@ -1,7 +1,6 @@
 function test_zmq_setsockopt
-    % let's just create a dummy socket
-    ctx = zmq_ctx_new();
-    socket = zmq_socket(ctx, 'ZMQ_REQ');
+    [ctx, socket] = setup;
+    cleanupObj = onCleanup(@() teardown(ctx, socket));
 
     % -- Options not tested here------------------------------------------------- %
     %% Read-Only properties
@@ -81,7 +80,15 @@ function test_zmq_setsockopt
 
         assert(condition, '%s should be %s, %s given.', option, value, response);
     end
+end
 
+function [ctx, socket] = setup
+    % let's just create and destroy a dummy socket
+    ctx = zmq_ctx_new();
+    socket = zmq_socket(ctx, 'ZMQ_REQ');
+end
+
+function teardown(ctx, socket)
     % close session
     zmq_close(socket);
     zmq_ctx_shutdown(ctx);
