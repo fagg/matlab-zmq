@@ -47,7 +47,7 @@ function [ctx, server, client] = setup
     ctx = zmq.core.ctx_new();
 
     client = zmq.core.socket(ctx, 'ZMQ_REQ');
-    zmq_connect(client, 'tcp://127.0.0.1:30000');
+    zmq.core.connect(client, 'tcp://127.0.0.1:30000');
 
     server = zmq.core.socket(ctx, 'ZMQ_REP');
     zmq.core.bind(server, 'tcp://127.0.0.1:30000');
