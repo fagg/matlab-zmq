@@ -17,7 +17,6 @@ function test_zmq_ctx_get
     maxs = zmq.core.ctx_get(ctx, 'ZMQ_MAX_SOCKETS');
     assert(maxs == 1024 || maxs == 1023, ...
         'ZMQ_MAX_SOCKETS should be 1024, %d given (I suspect receiving 1023 is OK).', maxs);
-
     % NOTICE:
     % According to documentation (http://api.zeromq.org/4-0:zmq-ctx-set)
     % it should be 1024, but `zmq.h` defines it as 1023...

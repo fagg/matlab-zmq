@@ -72,7 +72,3 @@ function teardown(ctx, socket)
     zmq.core.ctx_shutdown(ctx);
     zmq.core.ctx_term(ctx);
 end
-
-
-
-

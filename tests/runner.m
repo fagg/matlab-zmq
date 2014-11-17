@@ -1,5 +1,4 @@
 function success = runner(varargin)
-<<<<<<< HEAD
     % Run tests for the library
     %
     % ## Arguments
