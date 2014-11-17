@@ -8,7 +8,6 @@ function success = runner(varargin)
   % of this file will run.
   %
   % Notice that the files will be considered relative to this file.
-
   [test_path, ~, ~] = fileparts(mfilename('fullpath'));
 
   % save current path
