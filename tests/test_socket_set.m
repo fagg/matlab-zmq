@@ -1,0 +1,96 @@
+function test_socket_set
+    [ctx, socket] = setup;
+    cleanupObj = onCleanup(@() cellfun(@(f) f(), ...
+        {@() clear('socket'), @() teardown(ctx)}, ...
+        'UniformOutput', false));
+
+    % -- Options not tested here------------------------------------------------- %
+    %% Read-Only properties
+    % 'ZMQ_TYPE'
+    % 'ZMQ_RCVMORE'
+    % 'ZMQ_MECHANISM'
+
+    %% Specific options:
+    % ZMQ_ROUTER_MANDATORY (w) -> ZMQ_ROUTER
+    % ZMQ_PROBE_ROUTER (w) -> ZMQ_ROUTER, ZMQ_DEALER, ZMQ_REQ
+    % ZMQ_REQ_CORRELATE (w), ZMQ_REQ_RELAXED (w) -> ZMQ_REQ
+    % ZMQ_CONFLATE (w) -> ZMQ_PULL, ZMQ_PUSH, ZMQ_SUB, ZMQ_PUB, ZMQ_DEALER
+    % ZMQ_SUBSCRIBE (w), ZMQ_UNSUBSCRIBE (w) -> ZMQ_SUB
+    % ZMQ_IDENTITY (rw) -> ZMQ_REQ, ZMQ_REP, ZMQ_ROUTER, ZMQ_DEALER
+    % ZMQ_XPUB_VERBOSE (w) -> ZMQ_XPUB
+    % -------------------------------------------------------------------------- %
+
+    % Table with examples for test socket options
+    % OBS.: all of them are read-write
+    commonOptions = { ...
+        {'sndhwm'              , 0         } , ...
+        {'rcvhwm'              , 0         } , ...
+        {'affinity'            , 2         } , ...
+        {'rate'                , 10        } , ...
+        {'recovery_ivl'        , 1000      } , ...
+        {'sndbuf'              , 2         } , ...
+        {'rcvbuf'              , 2         } , ...
+        {'linger'              , 2         } , ...
+        {'reconnect_ivl'       , 120       } , ...
+        {'reconnect_ivl_max'   , 150       } , ...
+        {'backlog'             , 150       } , ...
+        {'maxmsgsize'          , 100       } , ...
+        {'multicast_hops'      , 5         } , ...
+        {'sndtimeo'            , 1         } , ...
+        {'rcvtimeo'            , 1         } , ...
+        {'ipv6'                , 1         } , ...
+        {'ipv4only'            , 0         } , ...
+        {'immediate'           , 1         },  ...
+        {'tcp_keepalive'       , 1         } , ...
+        {'tcp_keepalive_idle'  , 2         } , ...
+        {'tcp_keepalive_cnt'   , 2         } , ...
+        {'tcp_keepalive_intvl' , 2         } , ...
+... %    {'tcp_accept_filter'   , '123'     } , ... % I don't know how it exactly works
+        {'plain_server'        , 1         } , ...
+        {'plain_username'      , 'user'    } , ...
+        {'plain_password'      , 'password'} , ...
+        {'curve_server'        , 1         }   ...
+... %  {'curve_publickey'     , ''        } , ... % Z85 text generation/prase not implemented yet
+... %  {'curve_secretkey'     , ''        } , ... % Z85 text generation/prase not implemented yet
+... %  {'curve_serverkey'     , ''        } , ... % Z85 text generation/prase not implemented yet
+    };
+
+    % This loop will test all the socket options against the default values listed
+    % above.
+    %
+    % Once the socket is fresh and unused, all the options should remain with the
+    % default values.
+    for n = 1:(length(commonOptions)-1)
+        option = commonOptions{n}{1};
+        value = commonOptions{n}{2};
+
+        assert_does_not_throw(@socket.set, option, value);
+
+        response = socket.get(option);
+        if ~ischar(value)
+            condition = response == value;
+            % display
+            response = num2str(response);
+            value = num2str(value);
+        else
+            condition = strcmp(value, response);
+            % display
+            response = ['"' response '"'];
+            value = ['"' value '"'];
+        end
+
+        assert(condition, '%s should be %s, %s given.', option, value, response);
+    end
+end
+
+function [ctx, socket] = setup
+    % let's just create and destroy a dummy socket
+    ctx = zmq.core.ctx_new();
+    socket = zmq.Socket(ctx, 'rep');
+end
+
+function teardown(ctx)
+    % close session
+    zmq.core.ctx_shutdown(ctx);
+    zmq.core.ctx_term(ctx);
+end
