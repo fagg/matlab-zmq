@@ -23,7 +23,9 @@ classdef Socket < handle
         function delete(obj)
             cellfun(@(b) obj.unbind(b), obj.bindings, 'UniformOutput', false);
             cellfun(@(c) obj.disconnect(c), obj.connections, 'UniformOutput', false);
-            obj.close;
+            if (obj.socketPointer ~= 0)
+                obj.close;
+            end
         end
     end
 
