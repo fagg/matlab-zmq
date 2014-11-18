@@ -58,7 +58,7 @@ void handle_error() {
         if (caller == NULL) {
             sprintf(identifier, "zmq:%s", errDesc->name);
         } else {
-            sprintf(identifier, "zmq:%s:%s", &(caller[4]) /* omit 'zmq_' */, errDesc->name);
+            sprintf(identifier, "zmq:core:%s:%s", caller, errDesc->name);
         }
 
         mexErrMsgIdAndTxt(identifier, message);

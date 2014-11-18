@@ -9,7 +9,7 @@ function test_zmq_connect
     assert(response == 0, 'status code should be 0, %d given.', response);
 
     %% disconnecting
-    assert_throw(@zmq.core.connect, socket, 'tcp://127.0.0.1:30103');
+    assert_throw(@zmq.core.disconnect, socket, 'tcp://127.0.0.1:30103');
     response = assert_does_not_throw(@zmq.core.disconnect, socket, 'tcp://127.0.0.1:30000');
     assert(response == 0, 'status code should be 0, %d given.', response);
 end
