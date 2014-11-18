@@ -1,7 +1,7 @@
 classdef Context < handle
    
     properties (Access = private)
-        contextPointer;
+        contextPointer = [];
     end
     
     methods
@@ -17,6 +17,7 @@ classdef Context < handle
               zmq.core.ctx_term(obj.contextPointer);
            end
     end
+    
     methods (Access = protected)
         normalized = normalize_const_name(obj, name);
     end
