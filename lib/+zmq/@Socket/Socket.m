@@ -14,9 +14,7 @@ classdef Socket < handle
     methods
         function obj = Socket(contextPointer, socketType)
             % Normalize 'type' parameter:
-            socketType = strrep(upper(socketType), 'ZMQ_', '');
-            socketType = strcat('ZMQ_', socketType);
-
+            socketType = obj.normalize_const_name(socketType);
             obj.socketPointer = zmq.core.socket(contextPointer, socketType);
         end
 
@@ -27,6 +25,11 @@ classdef Socket < handle
                 obj.close;
             end
         end
+    end
+
+    methods (Access = protected)
+        normalized = normalize_const_name(obj, name);
+        varargout = normalize_msg_options(obj, varargin);
     end
 
 end

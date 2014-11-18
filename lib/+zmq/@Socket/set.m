@@ -1,7 +1,4 @@
 function set(obj, name, value)
-    % Normalize 'name' parameter:
-    optName = strrep(upper(name), 'ZMQ_', '');
-    optName = strcat('ZMQ_', optName);
-
+    optName = obj.normalize_const_name(name);
     option = zmq.core.setsockopt(obj.socketPointer, optName, value);
 end
