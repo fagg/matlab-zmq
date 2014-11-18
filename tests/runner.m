@@ -10,7 +10,7 @@ function success = runner(varargin)
     % Notice that the files will be considered relative to this file.
 
     [testPath, ~, ~] = fileparts(mfilename('fullpath'));
-    
+
     % save current path
     origPath = path;
     addpath(testPath);
@@ -67,7 +67,7 @@ function success = runner(varargin)
         % This is useful for continuous-integration services.
     else
         success = 1;
-        fprintf('All tests passed.\n');
+        fprintf('%d tests passed, %d failed\n', nsuccess, nfailures);
     end
 end
 
