@@ -1,7 +1,4 @@
 function option = get(obj, name)
-    % Normalize 'name' parameter:
-    optName = strrep(upper(name), 'ZMQ_', '');
-    optName = strcat('ZMQ_', optName);
-
+    optName = obj.normalize_const_name(name);
     option = zmq.core.getsockopt(obj.socketPointer, optName);
 end
