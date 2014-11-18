@@ -1,7 +1,5 @@
 classdef Socket < handle
-    %Socket Summary of this class goes here
-    %   Detailed explanation goes here
-
+    
     properties (Access = private)
         socketPointer;
     end
