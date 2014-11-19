@@ -26,24 +26,29 @@ function success = runner(varargin)
         tests = varargin;
     else
         try
-            tests = cellstr(ls(fullfile(testPath, 'test*.m')));
+            if (ispc)
+                tests = cellstr(ls(fullfile(testPath, 'test*.m')));
+            else
+                tests = strsplit(ls(fullfile(testPath, 'test*.m')),'\n');
+                tests = tests(:,1:end-1);
+            end
         catch
             tests = {};
         end
     end
 
-    fprintf('Running tests:\n\n');
     tic;
     for n = 1:length(tests)
         % Failed tests should throw an exception
         try
             [~, funcname, ~] = fileparts(tests{n});
+            fprintf('Running test (%s/%s): %s...', num2str(n), num2str(length(tests)), funcname);
             func = str2func(funcname);
             func();
-            fprintf('.');
+            fprintf('[PASS]\n');
             nsuccess = nsuccess + 1;
         catch e
-            fprintf('F');
+            fprintf('[FAIL]\n');
             % Check if it is octave (`try...catch` not 100% > needs workaround)
             if (exist('OCTAVE_VERSION', 'builtin'))
                 e = lasterror;
@@ -54,9 +59,7 @@ function success = runner(varargin)
         end
     end
 
-    fprintf('\n\n');
     toc;
-    fprintf('\n\n');
 
     if nfailures > 0
         success = 0;
