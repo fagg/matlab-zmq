@@ -1,6 +1,7 @@
 #include <mex.h>
 #include <errno.h>
 #include <string.h>
+#include <stdlib.h>
 #include <zmq.h>
 
 char *get_socket_type(const mxArray *);

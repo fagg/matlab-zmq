@@ -2,6 +2,7 @@
 #include <util/conversions.h>
 #include <util/errors.h>
 #include <mex.h>
+#include <stdlib.h>
 #include <zmq.h>
 
 void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])

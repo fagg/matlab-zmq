@@ -1,8 +1,10 @@
 #include "socket.h"
+#include "conversions.h"
 #include <mex.h>
 #include <zmq.h>
 #include <errno.h>
-
+#include <stdlib.h>
+#include <string.h>
 /*
   Lookupt table with metadata used to interpret socket types.
 

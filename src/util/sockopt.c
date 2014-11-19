@@ -2,6 +2,8 @@
 #include "sockopt.h"
 #include "conversions.h"
 #include <mex.h>
+#include <stdlib.h>
+#include <string.h>
 #include <zmq.h>
 
 /*
