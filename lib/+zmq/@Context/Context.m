@@ -17,8 +17,16 @@ classdef Context < handle
         end
 
         function delete(obj)
-            zmq.core.ctx_shutdown(obj.contextPointer);
-            zmq.core.ctx_term(obj.contextPointer);
+            if (obj.contextPointer ~= 0)
+                for n = 1:length(obj.spawnedSockets)
+                    socketObj = obj.spawnedSockets{n};
+                    if (isvalid(socketObj))
+                        socketObj.delete()
+                    end
+                end
+                zmq.core.ctx_shutdown(obj.contextPointer);
+                obj.term;
+            end
         end
     end
 
