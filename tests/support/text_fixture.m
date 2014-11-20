@@ -3,5 +3,8 @@ function text = text_fixture(name)
     [testPath, ~, ~] = fileparts(supportPath);
     fixturePath = fullfile(testPath, 'fixtures');
 
-    text = fileread(fullfile(fixturePath, name));
+    fid = fopen(fullfile(fixturePath, name), 'r');
+    data = fread(fid)';
+    fclose(fid);
+    text = char(data);
 end
