@@ -1,19 +1,22 @@
 classdef Socket < handle
-    
+
     properties (Access = private)
         socketPointer;
     end
 
     properties (Access = public)
-        bindings = {};
-        connections = {};
+        bindings;
+        connections;
     end
 
     methods
         function obj = Socket(contextPointer, socketType)
-            % Normalize 'type' parameter:
             socketType = obj.normalize_const_name(socketType);
+            % Core API
             obj.socketPointer = zmq.core.socket(contextPointer, socketType);
+            % Init properties
+            obj.bindings = {};
+            obj.connections = {};
         end
 
         function delete(obj)
