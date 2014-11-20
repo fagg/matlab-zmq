@@ -16,6 +16,14 @@ function test_socket_send_recv_multipart
     msg2 = server.recv;
     rc = server.get('rcvmore');
     assert(rc == 0, 'rcvmore option should be 0, after receive all parts in a multipart message');
+
+    %% -------- multipart methods ----------------------------------------------
+    original = uint8(text_fixture('wikipedia.html'));
+    assert_does_not_throw(@server.send_multipart, original);  % server send
+    received = assert_does_not_throw(@client.recv_multipart); % client recv
+    assert(strcmp(char(received), char(original)),...
+        ['multipart messages should be transmitted without errors,'...
+         ' but received differs from original']);
 end
 
 function [ctx, server, client] = setup
