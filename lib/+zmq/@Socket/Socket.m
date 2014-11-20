@@ -20,9 +20,13 @@ classdef Socket < handle
         end
 
         function delete(obj)
-            cellfun(@(b) obj.unbind(b), obj.bindings, 'UniformOutput', false);
-            cellfun(@(c) obj.disconnect(c), obj.connections, 'UniformOutput', false);
             if (obj.socketPointer ~= 0)
+                % Disconnect/Unbind all the endpoints
+                cellfun(@(b) obj.unbind(b), obj.bindings, 'UniformOutput', false);
+                cellfun(@(c) obj.disconnect(c), obj.connections, 'UniformOutput', false);
+                % Avoid linger time
+                obj.set('linger', 0);
+                % close
                 obj.close;
             end
         end
