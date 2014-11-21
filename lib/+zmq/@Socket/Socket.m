@@ -1,25 +1,32 @@
 classdef Socket < handle
-    
+
     properties (Access = private)
         socketPointer;
     end
 
     properties (Access = public)
-        bindings = {};
-        connections = {};
+        bindings;
+        connections;
     end
 
     methods
         function obj = Socket(contextPointer, socketType)
-            % Normalize 'type' parameter:
             socketType = obj.normalize_const_name(socketType);
+            % Core API
             obj.socketPointer = zmq.core.socket(contextPointer, socketType);
+            % Init properties
+            obj.bindings = {};
+            obj.connections = {};
         end
 
         function delete(obj)
-            cellfun(@(b) obj.unbind(b), obj.bindings, 'UniformOutput', false);
-            cellfun(@(c) obj.disconnect(c), obj.connections, 'UniformOutput', false);
             if (obj.socketPointer ~= 0)
+                % Disconnect/Unbind all the endpoints
+                cellfun(@(b) obj.unbind(b), obj.bindings, 'UniformOutput', false);
+                cellfun(@(c) obj.disconnect(c), obj.connections, 'UniformOutput', false);
+                % Avoid linger time
+                obj.set('linger', 0);
+                % close
                 obj.close;
             end
         end
