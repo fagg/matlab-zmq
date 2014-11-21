@@ -4,42 +4,47 @@ matlab-zmq
 What's this all about?
 ----------------------
 
-Quite simply, this will eventually be a complete ZMQ binding for MATLAB. Eventually, this project will include the
-following:
+This API aims to bring the awesome of ZMQ to MATLAB. This project has grown out @fagg wanting to
+better manage large scale numerical computing experiments across a High Performance Cluster. However,
+this library can be used in any number of contexts across any number of machines (even 1 is OK).
 
-+ Mex bindings for libzmq (core ZMQ API).
-+ Using said Mex bindings, a "nicer" interface to ZMQ for use with MATLAB.
 
 Getting Started
 ---------------
-+ Make sure you have ZMQ 4.0.4 installed. Change settings in `config.m` to point to your installation.
++ Make sure you have ZMQ 4.0.x installed. Change settings in `config.m` to point to your installation.
 + Ensure you have mex configured [[1]](http://www.mathworks.com/help/matlab/matlab_external/what-you-need-to-build-mex-files.html) [[2]](http://www.mathworks.com/support/compilers/R2014b/index.html)
 + Run `make.m`
-+ Make sure that the lib directory is on your MATLAB path.
++ Make sure that the `lib` directory is on your MATLAB path.
 + Start hacking.
 
 Stuff Doesn't Work
 ------------------
 
-Check out my dev branch, see if that works. Failing that, open an issue.
+- Git pull master - make clean; make; make test. Try again.
+- Try the dev branch. See if that works.
+- If not, open an issue and include the following information:
+  - Versions: MATLAB, ZMQ and Operating System
+  - Which version of matlab-zmq you're using (i.e. which branch, commit etc).
+  - What you are trying to do - preferably include a succinct code example which illustrates the problem.
+  - What doesn't work - please describe behaviour explicitly and include any error messages you encounter.
 
-Can I help?
+How can I help?
 -----------
 
-Yep -  pull requests, patches, comments, questions, concerns, outright abuse are welcome. I am working on this project
-in my free time, which is limited, so if you are interested in helping I welcome your input.
+Pull requests are most welcome. As a general rule, please base all pull requests in master. If in doubt, contact @fagg.
 
-Please be aware of the dev branch, also. However, when in doubt, base commits in master.
-
-How can I contact you?
+Development Team
 -----------------------
 
-ashton@fagg.id.au
+- Ashton Fagg (@fagg)
+- Anderson Bravalheri (@abravalheri)
 
 Contributors
 ------------
 
-The following people have made contributions to this library (with my sincere thanks):
+This project contains contributions from the following people: 
 
-- Anderson Bravalheri (@abravalheri - Initial support for Windows, Octave support, test framework + many other contributions.)
+- Ashton Fagg (@fagg)
+- Anderson Bravalheri (@abravalheri)
+- Matheus Svolenski (@msvolenski)
 
