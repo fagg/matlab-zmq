@@ -20,7 +20,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     int coreAPIReturn, coreAPIOptionFlag = 0;
 
     if (nrhs < 1) {
-        mexErrMsgIdAndTxt("zmq:recv:invalidArgs",
+        mexErrMsgIdAndTxt("zmq:core:recv:invalidArgs",
                 "Error: At least one argument is required: socket.");
         return;
     }
@@ -38,7 +38,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 
     socket = pointer_from_m(prhs[0]);
     if (socket == NULL) {
-        mexErrMsgIdAndTxt("zmq:recv:invalidSocket", "Error: Invalid socket.");
+        mexErrMsgIdAndTxt("zmq:core:recv:invalidSocket", "Error: Invalid socket.");
         return;
     }
 
@@ -74,7 +74,7 @@ int configure_flag(const mxArray **params, int nParams)
             if(strcmp(flagStr, "ZMQ_DONTWAIT") == 0)
                 coreAPIOptionFlag |= ZMQ_DONTWAIT;
             else
-                mexErrMsgIdAndTxt("zmq:recv:invalidFlag", "Error: Unknown flag.");
+                mexErrMsgIdAndTxt("zmq:core:recv:invalidFlag", "Error: Unknown flag.");
             mxFree(flagStr);
         }
     }
@@ -86,7 +86,7 @@ int configure_flag(const mxArray **params, int nParams)
  * while prepare it to return to MATLAB. Also handle the second optional return */
 void configure_return(int nlhs, mxArray **plhs, int msgLen, size_t bufLen, void *buffer) {
     if (msgLen > bufLen) {
-        mexWarnMsgIdAndTxt("zmq:recv:bufferTooSmall",
+        mexWarnMsgIdAndTxt("zmq:core:recv:bufferTooSmall",
             "Message is %d bytes long, but buffer is %d. Truncated.",
             msgLen, bufLen);
         plhs[0] = uint8_array_to_m((void*) buffer, bufLen);
@@ -113,7 +113,7 @@ size_t configure_buffer_length(const mxArray **param, int *paramIndex)
             length = *input;
             mxFree(input);
         } else {
-            mexErrMsgIdAndTxt("zmq:recv:unknowOops", "Unable to convert parameter.");
+            mexErrMsgIdAndTxt("zmq:core:recv:unknowOops", "Unable to convert parameter.");
             return 0;
         }
     }

@@ -11,17 +11,17 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     int rc;
 
     if (nrhs != 2) {
-        mexErrMsgIdAndTxt("zmq:unbind:invalidArgs",
+        mexErrMsgIdAndTxt("zmq:core:unbind:invalidArgs",
                 "Error: Two arguments are required: socket, endpoint.");
         return;
     }
     if (mxIsChar(prhs[1]) != 1) {
-        mexErrMsgIdAndTxt("zmq:unbind:invalidEndpoint",
+        mexErrMsgIdAndTxt("zmq:core:unbind:invalidEndpoint",
                 "Error: endpoint is not a string.");
         return;
     }
     if (mxGetM(prhs[1]) != 1) {
-        mexErrMsgIdAndTxt("zmq:unbind:endpointNotRowVec",
+        mexErrMsgIdAndTxt("zmq:core:unbind:endpointNotRowVec",
                 "Error: endpoint is not a row vector.");
         return;
     }

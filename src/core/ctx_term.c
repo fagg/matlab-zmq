@@ -8,7 +8,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     int coreAPIReturn;
 
     if (nrhs != 1) {
-        mexErrMsgIdAndTxt("zmq:ctx_term:invalidArgs",
+        mexErrMsgIdAndTxt("zmq:core:ctx_term:invalidArgs",
             "Error: Only a context argument is accepted by this function.");
     }
     contextPtr = (void **) mxGetData(prhs[0]);
@@ -16,15 +16,15 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     if (coreAPIReturn < 0) {
         switch (errno) {
             case EFAULT:
-                mexErrMsgIdAndTxt("zmq:ctx_term:invalidContext",
+                mexErrMsgIdAndTxt("zmq:core:ctx_term:invalidContext",
                     "Error: Invalid ZMQ context.");
                 break;
             case EINTR:
-                mexErrMsgIdAndTxt("zmq:ctx_term:termInter",
+                mexErrMsgIdAndTxt("zmq:core:ctx_term:termInter",
                         "Error: Termination was interrupted by a signal.");
                 break;
             default:
-                mexErrMsgIdAndTxt("zmq:ctx_term:unknownOops",
+                mexErrMsgIdAndTxt("zmq:core:ctx_term:unknownOops",
                         "Error: Something has gone very, very wrong. Unknown error.");
         }
     }

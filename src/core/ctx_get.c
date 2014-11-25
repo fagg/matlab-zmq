@@ -16,15 +16,15 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     int *mexReturn;
 
     if (nrhs != 2) {
-        mexErrMsgIdAndTxt("zmq:ctx_get:invalidArgs",
+        mexErrMsgIdAndTxt("zmq:core:ctx_get:invalidArgs",
                 "Error: Need two arguments - context and option_name.");
     }
     if (mxIsChar(prhs[1]) != 1) {
-        mexErrMsgIdAndTxt("zmq:ctx_get:optionNotString",
+        mexErrMsgIdAndTxt("zmq:core:ctx_get:optionNotString",
                 "Error: option_name must be a string.");
     }
     if (mxGetM(prhs[1]) != 1) {
-        mexErrMsgIdAndTxt("zmq:ctx_get:optionNotRowVec",
+        mexErrMsgIdAndTxt("zmq:core:ctx_get:optionNotRowVec",
                 "Error: option_name must be a row vector.");
     }
 
@@ -48,7 +48,7 @@ char *get_option_name(const mxArray *param)
     ret = (char *) mxCalloc(optLen, sizeof(char));
 
     if (mxGetString(param, ret, optLen) != 0) {
-        mexErrMsgIdAndTxt("zmq:ctx_get:optNameCopyFail",
+        mexErrMsgIdAndTxt("zmq:core:ctx_get:optNameCopyFail",
                 "Error: Couldn't get option_name as string.");
     }
     return ret;
@@ -71,7 +71,7 @@ int core_ctx_get(const mxArray *params[])
         optSelection = ZMQ_IPV6;
     else {
         mxFree(option);
-        mexErrMsgIdAndTxt("zmq:ctx_get:optNameInvalid",
+        mexErrMsgIdAndTxt("zmq:core:ctx_get:optNameInvalid",
                 "Error: Invalid option_name.");
     }
     ret = zmq_ctx_get(*contextPtr, optSelection);
@@ -80,7 +80,7 @@ int core_ctx_get(const mxArray *params[])
      * own option_value values. */
     if (ret < 0) {
         mxFree(option);
-        mexErrMsgIdAndTxt("zmq:ctx_get:coreAPIInvalidOption",
+        mexErrMsgIdAndTxt("zmq:core:ctx_get:coreAPIInvalidOption",
                 "Error: Invalid option_name (core API).");
     }
     mxFree(option);

@@ -11,7 +11,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     int rc;
 
     if (nrhs != 1) {
-        mexErrMsgIdAndTxt("zmq:close:invalidArgs",
+        mexErrMsgIdAndTxt("zmq:core:close:invalidArgs",
                 "Error: One argument is required: socket");
         return;
     }

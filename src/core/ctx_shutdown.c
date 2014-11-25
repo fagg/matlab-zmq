@@ -8,7 +8,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     int coreAPIReturn;
 
     if (nrhs != 1) {
-        mexErrMsgIdAndTxt("zmq:ctx_shutdown:invalidArgs",
+        mexErrMsgIdAndTxt("zmq:core:ctx_shutdown:invalidArgs",
                 "Error: Only a context argument is accepted by this function.");
     }
     contextPtr = (void **) mxGetData(prhs[0]);
@@ -16,11 +16,11 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     if (coreAPIReturn < 0) {
         switch (errno) {
             case EFAULT:
-                mexErrMsgIdAndTxt("zmq:ctx_shutdown:invalidContext",
+                mexErrMsgIdAndTxt("zmq:core:ctx_shutdown:invalidContext",
                         "Error: Invalid ZMQ Context.");
                 break;
             default:
-                mexErrMsgIdAndTxt("zmq:ctx_shutdown:unknownOops",
+                mexErrMsgIdAndTxt("zmq:core:ctx_shutdown:unknownOops",
                         "Error: Something has gone very, very wrong. Unknown error.");
         }
     }

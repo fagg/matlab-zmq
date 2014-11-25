@@ -13,15 +13,15 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     void **mexReturn;
 
     if (nrhs != 2) {
-        mexErrMsgIdAndTxt("zmq:socket:invalidArgs",
+        mexErrMsgIdAndTxt("zmq:core:socket:invalidArgs",
                 "Error: Two arguments are required - context, socket_type.");
     }
     if (mxIsChar(prhs[1]) != 1) {
-        mexErrMsgIdAndTxt("zmq:socket:sockTypeNotString",
+        mexErrMsgIdAndTxt("zmq:core:socket:sockTypeNotString",
                 "Error: socket_type is not a string.");
     }
     if (mxGetM(prhs[1]) != 1) {
-        mexErrMsgIdAndTxt("zmq:socket:sockTypeNotRowVec",
+        mexErrMsgIdAndTxt("zmq:core:socket:sockTypeNotRowVec",
                 "Error: socket_type is not a row vector.");
     }
 
@@ -45,7 +45,7 @@ char *get_socket_type(const mxArray *param)
     ret = (char *) mxCalloc(optLen, sizeof(char));
 
     if (mxGetString(param, ret, optLen) != 0) {
-        mexErrMsgIdAndTxt("zmq:socket:sockTypeCopyFail",
+        mexErrMsgIdAndTxt("zmq:core:socket:sockTypeCopyFail",
                 "Error: Couldn't get socket_type as string.");
     }
     return ret;
@@ -88,7 +88,7 @@ void *core_socket(const mxArray *params[])
         sockTypeVal = ZMQ_STREAM;
     else {
         mxFree(sockType);
-        mexErrMsgIdAndTxt("zmq:socket:unknownSocketType",
+        mexErrMsgIdAndTxt("zmq:core:socket:unknownSocketType",
                 "Error: Unknown socket type.");
     }
 
@@ -100,27 +100,27 @@ void *core_socket(const mxArray *params[])
 
         switch (errno) {
             case EINVAL:
-                mexErrMsgIdAndTxt("zmq:socket:unknownSocketTypeCore",
+                mexErrMsgIdAndTxt("zmq:core:socket:unknownSocketTypeCore",
                         "Error: Unknown socket type (core)."
                         "\n(original message: %s)", zmq_strerror(err));
                 break;
             case EFAULT:
-                mexErrMsgIdAndTxt("zmq:socket:invalidContext",
+                mexErrMsgIdAndTxt("zmq:core:socket:invalidContext",
                         "Error: Invalid ZMQ context."
                         "\n(original message: %s)", zmq_strerror(err));
                 break;
             case EMFILE:
-                mexErrMsgIdAndTxt("zmq:socket:maxSocketsReached",
+                mexErrMsgIdAndTxt("zmq:core:socket:maxSocketsReached",
                         "Error: Max sockets reached on context."
                         "\n(original message: %s)", zmq_strerror(err));
                 break;
             case ETERM:
-                mexErrMsgIdAndTxt("zmq:socket:contextTerminated",
+                mexErrMsgIdAndTxt("zmq:core:socket:contextTerminated",
                         "Error: ZMQ context was terminated."
                         "\n(original message: %s)", zmq_strerror(err));
                 break;
             default:
-                mexErrMsgIdAndTxt("zmq:socket:unknownOops",
+                mexErrMsgIdAndTxt("zmq:core:socket:unknownOops",
                         "Error: Something has gone very, very wrong. Unknown error."
                         "\n(original message: %s)", zmq_strerror(err));
         }

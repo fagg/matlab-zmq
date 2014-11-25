@@ -35,7 +35,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
         else
             plhs[0] = int_to_m( (void *) &coreAPIReturn);
     } else {
-        mexErrMsgIdAndTxt("zmq:send:invalidSocket", "Error: Invalid socket.");
+        mexErrMsgIdAndTxt("zmq:core:send:invalidSocket", "Error: Invalid socket.");
     }
 
     mxFree(payload);
@@ -54,11 +54,11 @@ void configure_message(const mxArray *rawMessage, void **payload, size_t *payloa
      * - Uncertainty when differentiating message shapes,
      *   e. g. [1 2; 3 4; 5 6], [1 2 3; 4 5 6], [1 2 3 4 5 6]. */
     if (mxGetM(rawMessage) != 1) {
-        mexErrMsgIdAndTxt("zmq:send:messageNotRowVec",
+        mexErrMsgIdAndTxt("zmq:core:send:messageNotRowVec",
                 "Error: Message must be a row vector. Flatten before attempting to send.");
     }
     if (mxIsUint8(rawMessage) != 1) {
-        mexErrMsgIdAndTxt("zmq:send:messageNotUint8",
+        mexErrMsgIdAndTxt("zmq:core:send:messageNotUint8",
                 "Error: Message payload must be uint8");
     }
 
@@ -66,7 +66,7 @@ void configure_message(const mxArray *rawMessage, void **payload, size_t *payloa
 
     *payload = uint8_array_from_m(rawMessage, *payloadLen);
     if (payload == NULL) {
-        mexErrMsgIdAndTxt("zmq:send:messageIsEmpty", "Error: You're trying to send an empty message.");
+        mexErrMsgIdAndTxt("zmq:core:send:messageIsEmpty", "Error: You're trying to send an empty message.");
     }
 }
 
@@ -82,7 +82,7 @@ int configure_flag(const mxArray **params, int nParams)
             else if(strcmp(flagStr, "ZMQ_DONTWAIT") == 0)
                 coreAPIOptionFlag |= ZMQ_DONTWAIT;
             else
-                mexErrMsgIdAndTxt("zmq:send:invalidFlag", "Error: Unknown flag.");
+                mexErrMsgIdAndTxt("zmq:core:send:invalidFlag", "Error: Unknown flag.");
             mxFree(flagStr);
         }
     }

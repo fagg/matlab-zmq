@@ -7,13 +7,13 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     void **mexReturn;
 
     if (nrhs != 0) {
-        mexErrMsgIdAndTxt("zmq:ctx_new:invalidArgs",
+        mexErrMsgIdAndTxt("zmq:core:ctx_new:invalidArgs",
             "Error: No arguments are accepted by this function.");
     }
     /* Set up ZMQ context and check its validity */
     context = zmq_ctx_new();
     if (context == NULL) {
-         mexErrMsgIdAndTxt("zmq:ctx_new:contextInitFail",
+         mexErrMsgIdAndTxt("zmq:core:ctx_new:contextInitFail",
                  "Error: ZMQ context instantiation failed.");
     }
 
