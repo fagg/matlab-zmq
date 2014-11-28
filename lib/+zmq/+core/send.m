@@ -11,7 +11,7 @@
 % Output:  number of bytes in the message if successful, otherwise -1.
 %
 % If the message cannot be queued on the socket, the zmq.core.send() function shall
-% fail with zmq:send:EAGAIN error code.
+% fail with zmq:core:send:EAGAIN error code.
 %
 % The following options are considered valid:
 %

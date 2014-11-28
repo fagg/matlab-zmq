@@ -5,7 +5,7 @@ function test_socket_bind
         'UniformOutput', false));
 
     %% binding
-    assert_throw('EPROTONOSUPPORT', @socket.bind, 'abc://localhost'); % invalid transport - TODO sometimes it throws "zmq:bind:unknownOops" ("No such file or directory").
+    assert_throw('EPROTONOSUPPORT', @socket.bind, 'abc://localhost'); % invalid transport - TODO sometimes it throws "zmq:core:bind:unknownOops" ("No such file or directory").
     assert_throw('EINVAL', @socket.bind, 'tcp://localhost');          % port must specified
     assert_does_not_throw(@socket.bind, 'tcp://127.0.0.1:30000');
 

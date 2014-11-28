@@ -23,7 +23,7 @@
 % * ZMQ_DONTWAIT
 %       Specifies that the operation should be performed in non-blocking mode.
 %       If there are no messages available on the specified socket, the
-%       zmq.core.recv() function shall fail with zmq:recv:EAGAIN error code.
+%       zmq.core.recv() function shall fail with zmq:core:recv:EAGAIN error code.
 %
 %
 % NOTICE
@@ -34,7 +34,7 @@
 %      `unicode2native(str, 'UTF-8')` or
 %      `feature('DefaultCharacterSet', 'UTF-8')`.
 %  - If the pre-allocated buffer is shorter than the message received, the returned
-%    vector will be truncated and a `zmq:recv:bufferTooSmall` warning will be thrown.
+%    vector will be truncated and a `zmq:core:recv:bufferTooSmall` warning will be thrown.
 %
 % EXAMPLE
 %     feature('DefaultCharacterSet', 'UTF-8');
@@ -46,7 +46,7 @@
 %       % maximum size of message2: 255 bytes
 %       fprintf('Received message2: %s\n', char(message2));
 %     catch e
-%       if strcmp(e.identifier, 'zmq:recv:EAGAIN')
+%       if strcmp(e.identifier, 'zmq:core:recv:EAGAIN')
 %         fprintf('No message available.\n');
 %       else
 %         rethrow(e);

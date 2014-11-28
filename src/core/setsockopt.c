@@ -17,17 +17,17 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     int rc;
 
     if (nrhs != 3) {
-        mexErrMsgIdAndTxt("zmq:core:sockopts:invalidArgs",
+        mexErrMsgIdAndTxt("zmq:core:setsockopt:invalidArgs",
                 "Error: Tree arguments are required: socket, option, value");
         return;
     }
     if (mxIsChar(prhs[1]) != 1) {
-        mexErrMsgIdAndTxt("zmq:core:sockopts:invalidOptionName",
+        mexErrMsgIdAndTxt("zmq:core:setsockopt:invalidOptionName",
                 "Error: option_name is not a string.");
         return;
     }
     if (mxGetM(prhs[1]) != 1) {
-        mexErrMsgIdAndTxt("zmq:core:sockopts:optionNameNotRowVec",
+        mexErrMsgIdAndTxt("zmq:core:setsockopt:optionNameNotRowVec",
                 "Error: option_name is not a row vector.");
         return;
     }

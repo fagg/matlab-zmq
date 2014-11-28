@@ -146,7 +146,7 @@ const zmq_sockopt_desc_t* find_sockopt_by_name(char* option) {
     }
 
     if (descriptor == NULL) {
-        mexErrMsgIdAndTxt("zmq:sockopt:invalidOptionName",
+        mexErrMsgIdAndTxt("zmq:core:sockopt:invalidOptionName",
             "Error: socket_option %s is invalid.", option);
     }
     return descriptor;
@@ -177,7 +177,7 @@ const zmq_sockopt_type_t* find_sockopt_type_by_id(int typeId) {
         }
     }
     if (descriptor == NULL) {
-        mexErrMsgIdAndTxt("zmq:sockopt:invalidOptionTypeId",
+        mexErrMsgIdAndTxt("zmq:core:sockopt:invalidOptionTypeId",
             "Error: socket_option typeId %d is invalid.", typeId);
     }
     return descriptor;
@@ -208,7 +208,7 @@ const zmq_sockopt_mechanism_t* find_sockopt_mechanism_by_id(int mechanismId) {
         }
     }
     if (descriptor == NULL) {
-        mexErrMsgIdAndTxt("zmq:sockopt:invalidOptionMechanismId",
+        mexErrMsgIdAndTxt("zmq:core:sockopt:invalidOptionMechanismId",
             "Error: socket_option mechanism %d is invalid.", mechanismId);
     }
     return descriptor;
@@ -234,7 +234,7 @@ const zmq_sockopt_mechanism_t* find_sockopt_mechanism_by_name(char* name) {
         }
     }
     if (descriptor == NULL) {
-        mexErrMsgIdAndTxt("zmq:sockopt:invalidOptionMechanism",
+        mexErrMsgIdAndTxt("zmq:core:sockopt:invalidOptionMechanism",
             "Error: socket_option mechanism %s is invalid.", name);
     }
     return descriptor;
