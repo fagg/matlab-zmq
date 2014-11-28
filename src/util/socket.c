@@ -52,7 +52,7 @@ const zmq_socket_type_t* find_socket_type_by_name(char* type) {
     }
 
     if (descriptor == NULL) {
-        mexErrMsgIdAndTxt("zmq:socket:invalidTypeName",
+        mexErrMsgIdAndTxt("zmq:core:socket:invalidTypeName",
             "Error: socket type %s is invalid.", type);
     }
     return descriptor;
@@ -83,7 +83,7 @@ const zmq_socket_type_t* find_socket_type_by_id(int id) {
     }
 
     if (descriptor == NULL) {
-        mexErrMsgIdAndTxt("zmq:socket:invalidTypeId",
+        mexErrMsgIdAndTxt("zmq:core:socket:invalidTypeId",
             "Error: socket type %d is invalid.", id);
     }
     return descriptor;
@@ -137,23 +137,23 @@ void socket_error() {
 
     switch (err) {
         case EINVAL:
-            mexErrMsgIdAndTxt("zmq:socket:invalidOptsCore",
+            mexErrMsgIdAndTxt("zmq:core:socket:invalidOptsCore",
                     "Error: The core API reports that something has gone wrong."
                     "\n(original message: %s)", zmq_strerror(err));
         break;
         case ETERM:
-            mexErrMsgIdAndTxt("zmq:socket:contextTerm",
+            mexErrMsgIdAndTxt("zmq:core:socket:contextTerm",
                     "Error: The context associated with the socket was terminated."
                     "\n(original message: %s)", zmq_strerror(err));
         break;
         case EFAULT:
         case ENOTSOCK:
-            mexErrMsgIdAndTxt("zmq:socket:invalidSocket",
+            mexErrMsgIdAndTxt("zmq:core:socket:invalidSocket",
                     "Error: Invalid socket."
                     "\n(original message: %s)", zmq_strerror(err));
         break;
         case EINTR:
-            mexErrMsgIdAndTxt("zmq:socket:interrupted",
+            mexErrMsgIdAndTxt("zmq:core:socket:interrupted",
                     "Error: The operation was interrupted by a signal."
                     "\n(original message: %s)", zmq_strerror(err));
         break;

@@ -32,7 +32,7 @@ function test_socket_send_recv
     %% client test - response receive
     delta = 2; % buffer reduction
     origState = warning; % save for further restoring
-    warning('off', 'zmq:recv:bufferTooSmall');
+    warning('off', 'zmq:core:recv:bufferTooSmall');
     msgRecv = client.recv(msgSentSz-delta, 'dontwait');
     warning(origState);
     assert(strcmp(char(msgSent(1:end-delta)), char(msgRecv)), ...
