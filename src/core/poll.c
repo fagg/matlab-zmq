@@ -7,9 +7,9 @@
 
 void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 {
-    void* socket = NULL;
-    long timeout = NULL;
-    int rc, revents, events;
+    void *socket = NULL;
+    int rc;
+    void *retRevents = NULL, *retEvents = NULL;
     zmq_pollitem_t item;
 
     if (nrhs == 1) {
@@ -20,15 +20,17 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     }
 
     item.socket = (void *) socket;
-    rc = zmq_poll(&item, 1);
+    
+    /* -1 for timeout blocks indefinitely until something happens. */
+    rc = zmq_poll(&item, 1, -1);
     if (rc != 1) {
             handle_error();
             return;
     } else {
-            revents = (int) item.revents[0];
-            events = (int) item.events[0];
-            plhs[0] = int_to_m(revents);
-            plhs[1] = int_to_m(events);
+            retRevents = (void *) &item.revents;
+            retEvents = (void *) &item.events;
+            plhs[0] = int_to_m(retRevents);
+            plhs[1] = int_to_m(retEvents);
             return;
     }
 }
