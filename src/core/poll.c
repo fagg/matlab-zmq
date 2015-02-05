@@ -8,28 +8,29 @@
 void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 {
     void **sockets = NULL;
-    int *flags = NULL;
     zmq_pollitem_t *items = NULL;
     int nItems, i, coreAPIReturn;
     long *timeout = NULL;
+    int *flags = NULL;
     short *ret = NULL;
   
     if (nrhs == 2) {
-            nItems = (int) int_from_m(plhs[0]);
+            nItems = *((int *) int_from_m(plhs[0]));
             sockets = (void **) mxGetData(plhs[1]);
-            flags = (int *) mxGetData(plhs[2]);
+            flags = (int *) int_from_m(plhs[2]);
     } else if (nrhs == 3) {
-            nItems = (int) int_from_m(plhs[0]);
-            sockets = (void **) mxGetData(plhs[0]);
-            flags = (int *) mxGetData(plhs[1]);
-            timeout = (long *) mxGetData(plhs[2]);
+            nItems = *((int *) int_from_m(plhs[0]));
+            sockets = (void **) mxGetData(plhs[1]);
+            flags = (int *) int_from_m(plhs[1]);
+            timeout = (long *) long_from_m(plhs[2]);
     } else {
             mexErrMsgIdAndTxt("zmq:core:poll:invalidArgs", "Invalid arguments.");
     }
 
-    items = (zmq_pollitem_t *) malloc(nItems * sizeof(zmq_pollitem_t));
+    /* allocate and populate zmq_pollitem_t with everything passed in from matlab */
+    items = (zmq_pollitem_t *) calloc((size_t) nItems, sizeof(zmq_pollitem_t));
     if (items == NULL) {
-            mexErrMsgIdAndTxt("zmq:core:poll:mallocFail","malloc() failed.");
+            mexErrMsgIdAndTxt("zmq:core:poll:callocFail","calloc() failed.");
     }
     
     for (i=0; i<nItems; i++) {
@@ -37,10 +38,12 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
             items[i].events = flags[i];
             items[i].revents = 0;
     }
+
+    /* call out to ZMQ to handle the poll */
     if (timeout != NULL) {
             coreAPIReturn = zmq_poll(items, nItems, *timeout);
     } else {
-            /* We assume default behaviour */
+            /* We assume default behaviour if no timeout is given*/
             coreAPIReturn = zmq_poll(items, nItems, 1);
     }
     if (coreAPIReturn == -1) {

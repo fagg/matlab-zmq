@@ -239,6 +239,16 @@ void* int_from_m(const mxArray* param) {
     return (void*) output;
 }
 
+void *long_from_m(const mxArray *param) {
+        long *output = NULL;
+        output = (long *) mxCalloc(1, sizeof(long));
+        if (output == NULL) {
+                mexErrMsgIdAndTxt("util:calloc", "Error: Unsuccessful memory allocation.");
+        }
+        output = (long *) mxGetData(param);
+        return (void *) output;
+}
+
 void* str_from_m(const mxArray* param) {
     char* str = NULL;
     size_t len;

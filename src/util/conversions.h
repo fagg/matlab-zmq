@@ -27,5 +27,5 @@ void* uint32_from_m(const mxArray* param);
 void* int_from_m(const mxArray* param);
 void* str_from_m(const mxArray* param);
 void* pointer_from_m(const mxArray* param);
-
+void* long_from_m(const mxArray* param);
 #endif
