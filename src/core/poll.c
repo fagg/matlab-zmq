@@ -7,22 +7,22 @@
 
 void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 {
-    void *sockets = NULL;
+    void **sockets = NULL;
     int *flags = NULL;
     zmq_pollitem_t *items = NULL;
     int nItems, i, coreAPIReturn;
-    long timeout = 1;
+    long *timeout = NULL;
     short *ret = NULL;
   
     if (nrhs == 2) {
-            nItems = (int) mxGetM(plhs[0]);
-            sockets = (void *) mxGetData(plhs[0]);
-            flags = (int *) mxGetData(plhs[1]);
+            nItems = (int) int_from_m(plhs[0]);
+            sockets = (void **) mxGetData(plhs[1]);
+            flags = (int *) mxGetData(plhs[2]);
     } else if (nrhs == 3) {
-            nItems = mxGetM(plhs[0]);
-            sockets = (void *) mxGetData(plhs[0]);
+            nItems = (int) int_from_m(plhs[0]);
+            sockets = (void **) mxGetData(plhs[0]);
             flags = (int *) mxGetData(plhs[1]);
-            timeout = (long *) int_from_m(plhs[2]);
+            timeout = (long *) mxGetData(plhs[2]);
     } else {
             mexErrMsgIdAndTxt("zmq:core:poll:invalidArgs", "Invalid arguments.");
     }
@@ -33,12 +33,16 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     }
     
     for (i=0; i<nItems; i++) {
-            items[i].socket = (void *) sockets[i];
+            items[i].socket = (void *) (sockets[i]);
             items[i].events = flags[i];
             items[i].revents = 0;
     }
-
-    coreAPIReturn = zmq_poll(items, nItems, timeout);
+    if (timeout != NULL) {
+            coreAPIReturn = zmq_poll(items, nItems, *timeout);
+    } else {
+            /* We assume default behaviour */
+            coreAPIReturn = zmq_poll(items, nItems, 1);
+    }
     if (coreAPIReturn == -1) {
             free(items);
             handle_error();
