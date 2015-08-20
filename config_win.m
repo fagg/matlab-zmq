@@ -8,4 +8,4 @@ ZMQ_COMPILED_LIB = 'libzmq-v120-mt-4_0_4.lib';
 ZMQ_LIB_PATH = 'C:\Program Files\ZeroMQ 4.0.4\lib\';
 
 % ZMQ headers path
-ZMQ_INCLUDE_PATH = 'C:\Program Files\ZeroMQ 4.0.4\include\';
+ZMQ_INCLUDE_PATH = 'C:\Program Files\ZeroMQ 4.0.4\include';

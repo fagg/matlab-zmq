@@ -52,7 +52,14 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     coreAPIReturn = zmq_recv(socket, buffer, bufLen * sizeof(uint8_t), coreAPIOptionFlag);
 
     if (coreAPIReturn < 0) {
-        handle_error();
+        /* Check if error is due to non-blocking with no message */
+        if (errno == EAGAIN) {
+            /* no error, so return zmq_recv return value */
+            plhs[0] = mxCreateNumericMatrix(1, 1, mxINT32_CLASS, mxREAL);
+            *((int*)mxGetData(plhs[0])) = coreAPIReturn;
+        }
+        else
+            handle_error();
     } else {
         /* Prepare the values that should be returned to MATLAB */
         configure_return(nlhs, plhs, coreAPIReturn, bufLen, buffer);
