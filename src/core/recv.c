@@ -53,8 +53,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 
     if (coreAPIReturn < 0) {
         /* Check if error is due to non-blocking with no message */
-        if (errno == EAGAIN)
-        {
+        if (errno == EAGAIN) {
             /* no error, so return zmq_recv return value */
             plhs[0] = mxCreateNumericMatrix(1, 1, mxINT32_CLASS, mxREAL);
             *((int*)mxGetData(plhs[0])) = coreAPIReturn;
