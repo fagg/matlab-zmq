@@ -18,7 +18,7 @@ static void *buffer = NULL;
 void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 {
     void *socket = NULL;
-    size_t bufLen = 0;
+    size_t bufLen = DEFAULT_BUFFER_LENGTH;
     int coreAPIReturn = 0;
     int coreAPIOptionFlag = 0;
 
@@ -36,14 +36,12 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
         return;
     }
     
-    /* Get bufLen and update the index where options should start */
+    /* Get the maximum message length if specified */
     if (nrhs >= 2) {
       bufLen = configure_buffer_length(prhs[1]);
-    } else {
-      bufLen = DEFAULT_BUFFER_LENGTH;
     }
 
-    /* Get the options for receiving */
+    /* Get the options for receiving if specified */
     if (nrhs >= 3) {
         coreAPIOptionFlag = configure_flag(prhs[2]);
     }
