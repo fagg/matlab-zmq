@@ -133,5 +133,6 @@ size_t configure_buffer_length(const mxArray *param)
 void free_at_exit(void)
 {
   free(buffer);
+  buffer = NULL;
   return;
 }
