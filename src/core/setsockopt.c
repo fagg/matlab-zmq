@@ -53,7 +53,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     optLen = typeDesc->maxLen;
     /* Correct len for compound types */
     if (typeDesc->id == SOPT_STRING || typeDesc->id == SOPT_KEY) {
-        optLen = strlen((char*) optValue)*sizeof(char);
+        optLen = mxGetNumberOfElements(prhs[2]);
     }
 
     rc = zmq_setsockopt(socket, optDesc->id, optValue, optLen);
