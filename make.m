@@ -168,8 +168,8 @@ function success = build(varargin)
 
   clean('*.o');
 
-  files = ls(fullfile(fullfile(lib_path, '+zmq/+core'), '*.mex*'));
-  if size(files, 1) == length(COMPILE_LIST)
+  files = dir(fullfile(fullfile(lib_path, '+zmq/+core'), '*.mex*'));
+  if numel(files) == numel(COMPILE_LIST)
     success = true;
     fprintf('\nSuccesful build for:\n');
   else
