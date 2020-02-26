@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CMakeRunConfigurationManager" shouldGenerate="true" shouldDeleteObsolete="true">
+    <generated>
+      <config projectName="zmq_publisher" targetName="zmq_publisher" />
+    </generated>
+  </component>
+  <component name="CMakeSettings" AUTO_RELOAD="true">
+    <configurations>
+      <configuration PROFILE_NAME="Debug" CONFIG_NAME="Debug" GENERATION_DIR="build" />
+    </configurations>
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="1fe2c3a1-7ae7-44e3-b0d0-bc391a19cf4d" name="Default Changelist" comment="" />
+    <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="ClangdSettings">
+    <option name="formatViaClangd" value="false" />
+  </component>
+  <component name="ExecutionTargetManager" SELECTED_TARGET="CMakeBuildProfile:Debug" />
+  <component name="ProjectId" id="1UNaXn5qjWkNhIwaS41SZ0ZYaAG" />
+  <component name="PropertiesComponent">
+    <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/../zmq_subscriber" />
+    <property name="settings.editor.selected.configurable" value="CMakeSettings" />
+  </component>
+  <component name="RunDashboard">
+    <option name="ruleStates">
+      <list>
+        <RuleState>
+          <option name="name" value="ConfigurationTypeDashboardGroupingRule" />
+        </RuleState>
+        <RuleState>
+          <option name="name" value="StatusDashboardGroupingRule" />
+        </RuleState>
+      </list>
+    </option>
+  </component>
+  <component name="RunManager">
+    <configuration name="zmq_publisher" type="CMakeRunConfiguration" factoryName="Application" PASS_PARENT_ENVS_2="true" PROJECT_NAME="zmq_publisher" TARGET_NAME="zmq_publisher" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="zmq_publisher" RUN_TARGET_NAME="zmq_publisher">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+  </component>
+  <component name="SvnConfiguration">
+    <configuration />
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="1fe2c3a1-7ae7-44e3-b0d0-bc391a19cf4d" name="Default Changelist" comment="" />
+      <created>1575199548281</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1575199548281</updated>
+      <workItem from="1575199549524" duration="84000" />
+      <workItem from="1575199714498" duration="2787000" />
+      <workItem from="1575222082117" duration="1268000" />
+      <workItem from="1575477048303" duration="1586000" />
+      <workItem from="1575480553791" duration="1088000" />
+      <workItem from="1575559004652" duration="608000" />
+      <workItem from="1575994628623" duration="6731000" />
+      <workItem from="1576075762636" duration="4922000" />
+      <workItem from="1576257349322" duration="2711000" />
+      <workItem from="1576260430673" duration="3584000" />
+      <workItem from="1576264843559" duration="70000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="1" />
+  </component>
+</project>

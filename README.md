@@ -17,6 +17,33 @@ Getting Started
 + Make sure that the `lib` directory is on your MATLAB path.
 + Start hacking.
 
+
+
+C Publisher/Subscriber example with Matlab 
+------------------------------------------
++ Make sure you have ZMQ 4.0.x installed. If you intall by ``` sudo apt-get install libzmq3-dev ```, CMake should be configure according. Recommend way is to build from source. https://github.com/zeromq/libzmq. 
+
+```
+./configure
+make
+sudo make install
+sudo ldconfig
+
+```
+
++ Clone the repository and compile with cmake 
+
+```
+cd matlab-zmq-master
+mkdir build
+cd build
+cmake ..   
+make
+```
+
+The C publisher/subscriber examples had been tested on Ubuntu 16.04 LTS & Matlab 2015a linux with Cmake.
+
+
 Stuff Doesn't Work
 ------------------
 
