@@ -2,6 +2,7 @@
 #define _UTIL_CONVERSIONS_H_
 
 #include <mex.h>
+#include <stdint.h>
 
 mxArray* uint64_matrix_to_m(void* handle, size_t m, size_t n);
 mxArray* int64_matrix_to_m(void* handle, size_t m, size_t n);

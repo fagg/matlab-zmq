@@ -3,6 +3,7 @@
 #include <zmq.h>
 #include <string.h>
 #include <stdlib.h>
+#include <stdint.h>
 
 /* -- from C to MATLAB ------------------------------------------------------ */
 
